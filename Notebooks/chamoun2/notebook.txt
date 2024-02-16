@@ -1,0 +1,4 @@
+2/16/2024
+
+- Created KiCad file and found respective symbol and footprint for the ESP32-S3-WROOM-2
+

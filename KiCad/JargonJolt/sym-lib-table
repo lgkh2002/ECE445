@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "ESP32-S3-WROOM-1-N16R2")(type "KiCad")(uri "C:/Users/Daniel/Desktop/ece445/KiCad/Symbols/ESP32-S3-WROOM-1-N16R2.kicad_sym")(options "")(descr ""))
+  (lib (name "JargonJolt")(type "KiCad")(uri "${KIPRJMOD}/JargonJolt.kicad_sym")(options "")(descr ""))
+)
