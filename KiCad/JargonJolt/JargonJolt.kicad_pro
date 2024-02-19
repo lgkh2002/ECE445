@@ -326,6 +326,22 @@
     [
       "39fa52d1-bab8-41e3-aba2-e2f783adaf1f",
       ""
+    ],
+    [
+      "f670ffa6-f5d6-4e9f-b184-650db4d3a97d",
+      "MCU"
+    ],
+    [
+      "a91347d5-40c0-4d74-a0b7-7f14df56e886",
+      "Power"
+    ],
+    [
+      "80b8e0d4-b7c3-4d2a-a6d1-a18c3cb1cfc9",
+      "User Interface"
+    ],
+    [
+      "9752bf8f-f974-45f7-9164-dbd42fc6da6b",
+      "Memory"
     ]
   ],
   "text_variables": {}
