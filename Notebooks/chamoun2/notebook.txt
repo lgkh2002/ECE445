@@ -2,3 +2,9 @@
 
 - Created KiCad file and found respective symbol and footprint for the ESP32-S3-WROOM-2
 
+2/21
+
+- Added some pinouts to ESP32, want to get started ASAP on routing the hierarchy from each modules with each other
+- Added buttons to schematic including debouncing
+Generally speaking ESP32 allows any pinout as long as there is no interference with the strapping. 
+We just need to assign the pins accordingly when we program the MCU
