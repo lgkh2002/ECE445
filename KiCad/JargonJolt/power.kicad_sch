@@ -562,7 +562,7 @@
   (symbol (lib_id "power:GND") (at 112.395 90.805 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0336ca10-2b6f-41f5-9c1f-c698f755bb69)
-    (property "Reference" "#PWR026" (at 112.395 97.155 0)
+    (property "Reference" "#PWR018" (at 112.395 97.155 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 112.395 95.25 0)
@@ -578,7 +578,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR026") (unit 1)
+          (reference "#PWR018") (unit 1)
         )
       )
     )
@@ -587,7 +587,7 @@
   (symbol (lib_id "power:+3.3VA") (at 121.666 110.871 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0affccaf-ae41-4d97-b6df-db7df2ed29f6)
-    (property "Reference" "#PWR032" (at 121.666 114.681 0)
+    (property "Reference" "#PWR019" (at 121.666 114.681 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3VA" (at 121.666 106.426 0)
@@ -603,7 +603,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR032") (unit 1)
+          (reference "#PWR019") (unit 1)
         )
       )
     )
@@ -612,7 +612,7 @@
   (symbol (lib_id "power:+3.3V") (at 125.095 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 125343ec-3dec-44ea-a05c-66dec88f8782)
-    (property "Reference" "#PWR027" (at 125.095 80.645 0)
+    (property "Reference" "#PWR021" (at 125.095 80.645 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 125.095 72.39 0)
@@ -628,7 +628,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR027") (unit 1)
+          (reference "#PWR021") (unit 1)
         )
       )
     )
@@ -637,7 +637,7 @@
   (symbol (lib_id "Device:C") (at 125.095 85.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 13ea46fb-3a56-49c8-83ea-fe02c5bae70b)
-    (property "Reference" "C5" (at 128.905 83.82 0)
+    (property "Reference" "C6" (at 128.905 83.82 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "C" (at 128.905 86.36 0)
@@ -654,7 +654,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "C5") (unit 1)
+          (reference "C6") (unit 1)
         )
       )
     )
@@ -663,7 +663,7 @@
   (symbol (lib_id "power:+12V") (at 55.245 90.17 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 152514cb-d6e0-4a8a-a500-ee160437eed8)
-    (property "Reference" "#PWR023" (at 55.245 93.98 0)
+    (property "Reference" "#PWR014" (at 55.245 93.98 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+12V" (at 58.42 86.995 0)
@@ -679,7 +679,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR023") (unit 1)
+          (reference "#PWR014") (unit 1)
         )
       )
     )
@@ -688,7 +688,7 @@
   (symbol (lib_id "power:GND") (at 55.245 75.565 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3be5c5f1-be74-44df-a2a0-b58771fde96a)
-    (property "Reference" "#PWR022" (at 55.245 81.915 0)
+    (property "Reference" "#PWR013" (at 55.245 81.915 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 55.245 80.01 0)
@@ -704,7 +704,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR022") (unit 1)
+          (reference "#PWR013") (unit 1)
         )
       )
     )
@@ -713,7 +713,7 @@
   (symbol (lib_id "power:GND") (at 121.666 118.491 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3d20e614-2aa6-4b4c-a438-1e8084faed87)
-    (property "Reference" "#PWR034" (at 121.666 124.841 0)
+    (property "Reference" "#PWR020" (at 121.666 124.841 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 121.666 122.936 0)
@@ -729,7 +729,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR034") (unit 1)
+          (reference "#PWR020") (unit 1)
         )
       )
     )
@@ -765,7 +765,7 @@
   (symbol (lib_id "power:+12V") (at 95.25 76.2 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4acbf35b-ff8b-4b45-b1e8-cc85ca6d7f7c)
-    (property "Reference" "#PWR025" (at 95.25 80.01 0)
+    (property "Reference" "#PWR016" (at 95.25 80.01 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+12V" (at 98.425 73.025 0)
@@ -781,7 +781,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR025") (unit 1)
+          (reference "#PWR016") (unit 1)
         )
       )
     )
@@ -790,7 +790,7 @@
   (symbol (lib_id "Device:C") (at 121.666 114.681 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 7d0a9cb5-1d8e-454e-88cd-12c7f458ef82)
-    (property "Reference" "C6" (at 125.476 113.411 0)
+    (property "Reference" "C5" (at 125.476 113.411 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "C" (at 125.476 115.951 0)
@@ -807,7 +807,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "C6") (unit 1)
+          (reference "C5") (unit 1)
         )
       )
     )
@@ -816,7 +816,7 @@
   (symbol (lib_id "Switch:SW_DIP_x01") (at 112.268 110.871 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8d828e07-cc6e-45be-9c54-2fb7ab7d066f)
-    (property "Reference" "SW4" (at 112.268 103.124 0)
+    (property "Reference" "SW3" (at 112.268 103.124 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_DIP_x01" (at 112.268 105.664 0)
@@ -833,7 +833,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "SW4") (unit 1)
+          (reference "SW3") (unit 1)
         )
       )
     )
@@ -842,7 +842,7 @@
   (symbol (lib_id "power:GND") (at 55.245 92.71 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid beb5536e-660e-46fa-816f-680d0e7c735d)
-    (property "Reference" "#PWR024" (at 55.245 99.06 0)
+    (property "Reference" "#PWR015" (at 55.245 99.06 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 55.245 97.155 0)
@@ -858,7 +858,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR024") (unit 1)
+          (reference "#PWR015") (unit 1)
         )
       )
     )
@@ -893,7 +893,7 @@
   (symbol (lib_id "power:+3.3V") (at 101.981 110.871 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f3cc84bb-8ba3-413a-a44a-2ad16f71fed9)
-    (property "Reference" "#PWR021" (at 101.981 114.681 0)
+    (property "Reference" "#PWR017" (at 101.981 114.681 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 101.981 106.426 0)
@@ -909,7 +909,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "#PWR021") (unit 1)
+          (reference "#PWR017") (unit 1)
         )
       )
     )
@@ -944,7 +944,7 @@
   (symbol (lib_id "Regulator_Linear:AMS1117-3.3") (at 112.395 81.28 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid fb2d6803-1f2c-4028-a74c-1a953ee07d6d)
-    (property "Reference" "U4" (at 112.395 74.93 0)
+    (property "Reference" "U2" (at 112.395 74.93 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "ADP3339" (at 112.395 77.47 0)
@@ -962,7 +962,7 @@
     (instances
       (project "JargonJolt"
         (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f/a91347d5-40c0-4d74-a0b7-7f14df56e886"
-          (reference "U4") (unit 1)
+          (reference "U2") (unit 1)
         )
       )
     )
