@@ -8,3 +8,9 @@
 - Added buttons to schematic including debouncing
 Generally speaking ESP32 allows any pinout as long as there is no interference with the strapping. 
 We just need to assign the pins accordingly when we program the MCU
+
+
+
+3/1
+
+added i2s schematic
