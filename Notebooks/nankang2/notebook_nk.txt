@@ -1,0 +1,7 @@
+2/20/2024
+- Research how to use AutoCAD
+- Create a rough 3D outshell in AutoCAD
+
+3/2/2024
+- Research 3.52inch_e-Paper SPI communication and code to print image on the screen
+- Research image format conversion for screen
