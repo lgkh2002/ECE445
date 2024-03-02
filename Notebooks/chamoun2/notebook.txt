@@ -14,3 +14,5 @@ We just need to assign the pins accordingly when we program the MCU
 3/1
 
 added i2s schematic
+
+added more footprints
