@@ -216,7 +216,7 @@
     (property "Value" "Conn_01x06" (at 49.911 51.181 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (at 47.879 48.641 0)
+    (property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" (at 47.879 48.641 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 47.879 48.641 0)
