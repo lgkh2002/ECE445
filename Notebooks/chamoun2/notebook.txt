@@ -16,3 +16,7 @@ We just need to assign the pins accordingly when we program the MCU
 added i2s schematic
 
 added more footprints
+
+
+3/4
+Added Gerbers, approved
