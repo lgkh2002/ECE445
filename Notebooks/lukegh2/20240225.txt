@@ -2,7 +2,7 @@ The design doc is finished up, and we have our design review tomorrow morning. T
 still isn't really concretely decided upon is the implementation of the memory module, that being whether or not 
 we should use the sram chip we found a few weeks ago or if we should instead use an SD card. I'm personally leaning towards
 and SD card, especially because it will allow us to test things without having to get internet working first,
-and it allows internet to be cut from teh design completely if we can't get it to work. Futhermore, the SD card is 
+and it allows internet to be cut from the design completely if we can't get it to work. Futhermore, the SD card is 
 stable memory, meaning when we want to power this thing off it an get powered off compeltely, saving valuable battery
 life. An SD card may take a little bit more power to read from and write to though, but the 3DS did it and it just had a
 battery so we should be fine. Honestly the more I think about it the more impressive it is that they got 3D graphics

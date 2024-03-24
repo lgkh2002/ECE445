@@ -1,0 +1,14 @@
+Parts and the PCB came in today. I assembled it, mostly via hand soldering. There are already some improvements that
+can be made to the next version of the board
+
+-make the board a little bigger maybe, we aren't hurting for space so might as well extend the board and space things
+out. It'll make things easier to test
+-add LEDs that indicate power is coming out of the linear regulator and LEDs that indicate when we are transmitting
+on the SPI lines. These are mostly debugging tools and can be desoldered to save power when its time to put everything
+together in the box
+-switch the terminals for the barrel jack connector. The pinout wasnt clear on the data sheet and i seem to have
+the pad assignments switched.
+
+Also missing just a couple parts for fully completing the PCB. We should have them next week and I'm planning to 
+do preliminary testing on it as soon as I can next week. I think Nancy has been dabbling in the programming side,
+so I'll talk to her to see if we can also test the basic capibilities of the ESP 32.
