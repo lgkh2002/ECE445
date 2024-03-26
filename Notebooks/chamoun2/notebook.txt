@@ -20,3 +20,6 @@ added more footprints
 
 3/4
 Added Gerbers, approved
+
+3/25
+Added test leds, adding revisions including switching the pins of the barrel connector.
