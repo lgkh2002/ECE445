@@ -23,3 +23,7 @@ Added Gerbers, approved
 
 3/25
 Added test leds, adding revisions including switching the pins of the barrel connector.
+
+
+3/26
+Waiting on team to get back to me on the updated schematics and if they approve of it as well, I will submit the already approved gerbers to our TA.
