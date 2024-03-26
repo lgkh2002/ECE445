@@ -296,6 +296,30 @@
     )
   )
 
+  (symbol (lib_id "Mechanical:MountingHole") (at 252.73 124.46 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (uuid 9d904980-e258-4bfe-950b-3d6bc89715a9)
+    (property "Reference" "H4" (at 256.159 123.19 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "MountingHole" (at 256.159 125.73 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "MountingHole:MountingHole_2.2mm_M2" (at 252.73 124.46 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 252.73 124.46 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (instances
+      (project "JargonJolt"
+        (path "/39fa52d1-bab8-41e3-aba2-e2f783adaf1f"
+          (reference "H4") (unit 1)
+        )
+      )
+    )
+  )
+
   (symbol (lib_id "Connector:TestPoint") (at 108.077 136.144 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bc156bb0-367c-4930-ab8a-2964b53fb84d)
