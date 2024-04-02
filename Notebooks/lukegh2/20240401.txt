@@ -1,0 +1,19 @@
+Continued testing with ESP32 and PCB
+
+-successfully flashed circuit board with code that causes all of the SPI chip select lines
+to blink low and high. Measured the output of these chips with an oscilloscope and found that it did work
+
+Some notes about programming the ESP32 with USB to UART bridge
+
+	-Make sure not to mix up RX and TX pins. If something doesn't work, they're probably flipped
+	-Seems like the program wont begin until the USB to UART bridge is unplugged. This might be a glitch,
+	 but just unplugging it makes everything run fine so not a big deal
+
+-successfully flashed ESP32 with a program that reads the input from button 1 and drives CS2 (pad 24 in KiCad)
+high when the button is pressed. Output pin measured again with an oscilloscope
+
+With these tests, the circuit board is basically verified to be working properly. It can be programmed, is capable
+of driving pins high, and is capable of reading input pins and responding accordingly. The 2nd version of the PCB
+that is coming in next week will include some nice quality of life changes, but the project could theoretically
+work just fine with the v1.0.0 board that we're using now. Now that the circuitry works as far as we know, its time
+to jump into the actual coding more seriously.
