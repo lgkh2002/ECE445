@@ -42,12 +42,23 @@
 #include "SD.h"
 #include "SPI.h"
 
-#define SCK 40
-#define MISO 41
-#define MOSI 42
-#define CS 1
+#define vsck 40
+#define vmiso 41
+#define vmosi 42
+#define vcs 1
 
-SPIClass spi = SPIClass();
+#define hsck 10
+#define hmiso 11
+#define hmosi 12
+#define hcs 14
+
+
+#if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+#define VSPI 0
+#define HSPI 1
+#endif
+
+
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\n", dirname);
@@ -210,34 +221,32 @@ void testFileIO(fs::FS &fs, const char * path){
 
 
 
-
+static const int spiClk = 1000000;
+SPIClass * vspi = NULL; 
+SPIClass * hspi = NULL;
 
 
 void setup() {
   // put your setup code here, to run once:
-  // 41 pins
+
+  Serial.begin(115200);
+  while(!Serial) { delay (10); }
+
   Serial.println("SETUP START");  
+  vspi = new SPIClass(VSPI); 
+  hspi = new SPIClass(HSPI);
+
   //inputs
   pinMode(7, INPUT); //BUSY
-
   pinMode(8, INPUT); //BUTTON1
   pinMode(9, INPUT); //BUTTON2
   pinMode(20, INPUT); //BUTTON3
   
   //outputs
-  //pinMode(10, OUTPUT); //HSPI_SCLK
-  //pinMode(11, OUTPUT); //HSPI_MISO
-  //pinMode(12, OUTPUT); //HSPI_MOSI
 
-  //pinMode(40, OUTPUT); //VSPI_SCLK
-  //pinMode(41, OUTPUT); //VSPI_MISO  
-  //pinMode(42, OUTPUT); //VSPI_MOSI
 
-  //pinMode(1, OUTPUT); //CS0
-  //digitalWrite(1, HIGH); //CS0
-
-  //pinMode(14, OUTPUT); //CS1
-  //pinMode(47, OUTPUT); //CS2
+  pinMode(14, OUTPUT); //CS1
+  pinMode(47, OUTPUT); //CS2
   pinMode(48, OUTPUT); //RST
 
   pinMode(17, OUTPUT); //I2S_LRCLK
@@ -253,22 +262,25 @@ void setup() {
   //--------------------------------------------------------------------------------------------------------------
 
 
+  vspi->begin(vsck, vmiso, vmosi, vcs);
+  hspi->begin(hsck, hmiso, hmosi, hcs);
 
-  Serial.begin(115200);
-  while(!Serial) { delay (10); }
-  spi.begin(SCK, MISO, MOSI, CS);
-  Serial.println("got here");
+  pinMode(vspi->pinSS(), OUTPUT); //CS0
+  pinMode(hspi->pinSS(), OUTPUT); //CS1
 
-  Serial.println(SCK);
-  Serial.println(MISO);
-  Serial.println(MOSI);
-  Serial.println(CS);
-  //Serial.println(digitalRead(CS));
-  //if(!SD.begin(cs)){ //Change to this function to manually change CS pin
-  if(!SD.begin(CS,spi,80000000)){
+
+  /*Serial.println(sck);
+  Serial.println(miso);
+  Serial.println(mosi);
+  Serial.println(cs);*/
+
+  digitalWrite(vspi->pinSS(), LOW);
+  if(!SD.begin(vspi->pinSS(),*vspi)){
       Serial.println("Card Mount Failed");
       return;
   }
+digitalWrite(vspi->pinSS(),HIGH);
+
   uint8_t cardType = SD.cardType();
 
   if(cardType == CARD_NONE){
@@ -313,5 +325,14 @@ void loop() {
   //Serial.printf("TEST");
   //delay(500);
   //chip select high
+  spiCommand(hspi, 0b01010101);
+}
 
+void spiCommand(SPIClass *spi, byte data) {
+  //use it as you would the regular arduino SPI API
+  spi->beginTransaction(SPISettings(spiClk, MSBFIRST, SPI_MODE0));
+  digitalWrite(spi->pinSS(), LOW); //pull SS slow to prep other end for transfer
+  spi->transfer(data);
+  digitalWrite(spi->pinSS(), HIGH); //pull ss high to signify end of data transfer
+  spi->endTransaction();
 }
