@@ -1,0 +1,15 @@
+Tried to get the SD card things running. Daniel did a lot of work on it earlier today and was unsuccessful so now
+trying it out
+
+-MOSI is not outputting
+-SCLK is not outputting
+
+both go high brielfy when the SD card begin process is run, but the overall process still fails of course
+
+probable causes:
+	SD card not formatted correctly, can't format our 64 GB micro SD card in FAT32
+	Pull up resistors on the SD card module are causing problems, pull all floating signals high
+
+Tried all output configurations for the SD card SPI pins, didn't do anything helpful
+Chip select seems to be doing something, but it isn't discernable what
+Will buy a 32GB SD card and try again tommorrow

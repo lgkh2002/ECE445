@@ -1,0 +1,22 @@
+SD card finally works!
+
+Changed declaration of SPIClass handler to doing it with a pointer
+
+Old:
+
+SPIClass vspi = SPIClass(VSPI);
+
+where VSPI is defined as 3 as per the datasheet
+
+new:
+
+SPIClass * vspi = NULL;
+
+vspi = new SPIClass(VSPI);
+
+also changed the definition of VSPI to 0. 1 also works, but 2 and 3 don't, which is odd because most sources say
+2 and 3 correspond to HSPI and VSPI respectively, which are the two SPI channels which are typically availible
+to users. However one of the SPI related includes seems to imply that isn't the case for the ESP32S3 and a few other
+ESP32 chips, so it makes sense that these are the numbers that work instead.
+
+Included is an oscilloscope trace of a working serial clock signal for a short arbitrary bit write to test SPI.
