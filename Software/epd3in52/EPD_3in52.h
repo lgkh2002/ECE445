@@ -31,14 +31,15 @@
 #ifndef __EPD_3IN52_H_
 #define __EPD_3IN52_H_
 
-#include "DEV_Config.h"
+#include "epdif.h"
 
 // Display resolution
-#define EPD_3IN52_WIDTH       240
-#define EPD_3IN52_HEIGHT      360 
+#define EPD_WIDTH       240
+#define EPD_HEIGHT      360 
 
-#define LUTGC_TEST          //
-#define LUTDU_TEST          //
+#define UWORD   unsigned int
+#define UBYTE   unsigned char
+#define UDOUBLE unsigned long
 
 #define EPD_3IN52_WHITE                         0xFF  // 
 #define EPD_3IN52_BLACK                         0x00  //
@@ -54,16 +55,34 @@
 
 extern unsigned char EPD_3IN52_Flag;
 
-void EPD_3IN52_SendCommand(UBYTE Reg);
-void EPD_3IN52_SendData(UBYTE Data);
-void EPD_3IN52_refresh(void);
-void EPD_3IN52_lut_GC(void);
-void EPD_3IN52_lut_DU(void);
-void EPD_3IN52_Init(void);
-void EPD_3IN52_display(UBYTE* picData);
-void EPD_3IN52_display_NUM(UBYTE NUM);
-void EPD_3IN52_Clear(void);
-void EPD_3IN52_sleep(void);
+class Epd : EpdIf {
+public:
+    Epd();
+    ~Epd();
+    int Init(void);
+    void Reset(void);
+    void SendCommand(unsigned char command);
+    void SendData(unsigned char data);
+    void ReadBusy(void);
+    void lut(void);
+    void refresh(void);
+    void lut_GC(void);
+    void lut_DU(void);
+    void display(UBYTE* picData);
+    void display_part(UBYTE *Image, UWORD xstart, UWORD ystart, UWORD image_width, UWORD image_heigh);
+    void display_NUM(UBYTE NUM);
+    void Clear(void);
+    void sleep(void);
+
+private:
+    unsigned int reset_pin;
+    unsigned int dc_pin;
+    unsigned int cs_pin;
+    unsigned int busy_pin;
+    unsigned long width;
+    unsigned long height;
+    unsigned char EPD_3IN52_Flag;
+};
 
 
 
