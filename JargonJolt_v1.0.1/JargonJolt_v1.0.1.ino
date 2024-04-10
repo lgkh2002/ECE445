@@ -38,6 +38,12 @@
  * https://github.com/espressif/arduino-esp32/tree/master/libraries/SD
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
@@ -51,6 +57,10 @@
 #define hmiso 11
 #define hmosi 12
 #define hcs 14
+
+#define button1 8
+#define button2 9
+#define button3 20
 
 
 #if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
@@ -109,20 +119,26 @@ void removeDir(fs::FS &fs, const char * path){
     }
 }
 
-void readFile(fs::FS &fs, const char * path){
+String readFile(fs::FS &fs, const char * path){
+    String message;
     Serial.printf("Reading file: %s\n", path);
 
     File file = fs.open(path);
     if(!file){
         Serial.println("Failed to open file for reading");
-        return;
+        return message;
     }
+
 
     Serial.print("Read from file: ");
     while(file.available()){
-        Serial.write(file.read());
+        char charRead=file.read();
+        message+=charRead;
+        //Serial.write(file.read());
     }
     file.close();
+    Serial.print(message);
+    return message;
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
@@ -238,9 +254,9 @@ void setup() {
 
   //inputs
   pinMode(7, INPUT); //BUSY
-  pinMode(8, INPUT); //BUTTON1
-  pinMode(9, INPUT); //BUTTON2
-  pinMode(20, INPUT); //BUTTON3
+  pinMode(button1, INPUT); //BUTTON1
+  pinMode(button2, INPUT); //BUTTON2
+  pinMode(button3, INPUT); //BUTTON3
   
   //outputs
 
@@ -318,6 +334,8 @@ digitalWrite(vspi->pinSS(),HIGH);
   Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
   Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
 
+  srand(time(NULL));
+
 }
 
 void loop() {
@@ -326,6 +344,124 @@ void loop() {
   //delay(500);
   //chip select high
   spiCommand(hspi, 0b01010101);
+
+  int randval;
+  String newstring;
+  String revstring;
+
+  unsigned int cardidx =0 ;
+  unsigned int newcardcnt = 0;
+  unsigned int totalcards = 0;
+  unsigned int activecardcnt = 0;
+
+  unsigned int activecards[100];
+  unsigned int finished[100] = {0};
+
+
+  //get total card number from parser
+
+  unsigned int newstate[totalcards];
+  unsigned int revstate[totalcards];
+
+  if(SD.exists("/newstatus.txt")){                         //check for newstatus file
+    newstring = readFile(SD, "/newstatus.txt");     //if it exists, read it
+  }
+
+  else{
+    writeFile(SD, "/newstatus.txt","");               //otherwise, create it
+    while(cardidx<totalcards){
+      appendFile(SD,"/newstatus.txt","0");             //set all new status to 0
+      cardidx+=1;
+    }
+    newstring = readFile(SD, "/newstatus.txt");  //get string for newstatus we just created
+  }
+
+  if(SD.exists("/revstatus.txt")){                         //check for revstatus file
+    revstring = readFile(SD, "/revstatus.txt");     //if it exists, read it
+  }
+
+  else{
+    writeFile(SD, "/revstatus.txt","");               //otherwise, create it
+    while(cardidx<totalcards){
+      appendFile(SD,"/newstatus.txt","0");             //set all rev status to 0
+      cardidx+=1;
+    }
+    revstring = readFile(SD, "/revstatus.txt");  //get string for newstatus we just created
+  }
+
+
+
+  cardidx = 0;
+  char * s;
+
+  for ( s=&newstring[0]; *s != '\0'; s++ ){      //for every character in newstring file
+    newstate[cardidx]=atoi(s);                  //read character into integer array
+    cardidx+=1;
+    s+=1;                                     
+  }
+
+  cardidx = 0;
+
+  for ( s=&revstring[0]; *s != '\0'; s++ ){      //for every character in newstring file
+    revstate[cardidx]=atoi(s);                  //read character into integer array
+    s+=1;               
+    cardidx+=1;                      
+  }
+
+
+  while(newcardcnt<20 && cardidx<totalcards){    //while less than 20 new cards selected and still have cards to search
+    if (newstate[cardidx]==0){                    //if card is new
+      activecards[activecardcnt]=cardidx;        //add to active cards
+      activecardcnt+=1;
+      newcardcnt+=1;
+    }
+    cardidx+=1;
+  }
+
+  cardidx=0;
+
+  while(activecardcnt<100 && cardidx<totalcards){     //while less than 100 total active cards and still have cards to search
+    if(newstate[cardidx]==1 && revstate[cardidx]==0){ //if card not new and revstate says 0 days to review
+      activecards[activecardcnt]=cardidx;             //add to active cards
+      activecardcnt+=1;
+    }
+    cardidx+=1;
+  }
+
+  //now, activecards[] should contain all the active cards, with activecardcnt telling how many spaces are fill out of the possible 100
+
+  while(randval!=-1){
+      randval=getrandomnumber(finished, activecardcnt);
+      if(randval==-1){
+        continue;
+      }
+
+      cardidx=randval;
+      //show question to card with index cardidx
+
+
+      int b1state = digitalRead(button1);  //read all buttons
+      int b2state = digitalRead(button2);
+      int b3state = digitalRead(button3);
+
+      while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
+        delay(10);
+        b1state = digitalRead(button1);
+        b2state = digitalRead(button2);
+        b3state = digitalRead(button3);
+      }
+
+      //update to answer
+
+      b1state = 0;         //set all button reads back to unpressed
+      b2state = 0;
+      b3state = 0;
+
+      //TODO: once a button is pressed, move to next card and update if a card is finished or not
+  }
+
+  //TODO: add end state stuff once all cards finished
+
 }
 
 void spiCommand(SPIClass *spi, byte data) {
@@ -335,4 +471,23 @@ void spiCommand(SPIClass *spi, byte data) {
   spi->transfer(data);
   digitalWrite(spi->pinSS(), HIGH); //pull ss high to signify end of data transfer
   spi->endTransaction();
+}
+
+int getrandomnumber(unsigned int disallowed[], unsigned int maxval) {   
+  bool allblocked = true;          //assume all values disallowed
+  for(int i = 0; i<=maxval; i++){   //check every value between 0 and maxval
+    if(disallowed[i]==0){          //if any not disallowed, set allblocked false
+      allblocked = false;
+    }
+  }
+
+  if (allblocked == true){       //if all are blocked
+    return -1;
+  }
+
+  unsigned int retval=rand()%(maxval+1);          //pick random number from 0-maxval
+  while(disallowed[retval]==1){
+    retval=rand()%(maxval+1);
+  }
+  return retval;
 }
