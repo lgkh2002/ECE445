@@ -137,7 +137,7 @@ String readFile(fs::FS &fs, const char * path){
         //Serial.write(file.read());
     }
     file.close();
-    Serial.print(message);
+    Serial.println(message);
     return message;
 }
 
@@ -317,7 +317,7 @@ digitalWrite(vspi->pinSS(),HIGH);
 
   uint64_t cardSize = SD.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
-
+/*
   //START OF SD CARD TESTS
   listDir(SD, "/", 0);
   createDir(SD, "/mydir");
@@ -333,8 +333,8 @@ digitalWrite(vspi->pinSS(),HIGH);
   testFileIO(SD, "/test.txt");
   Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
   Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
-
-  srand(time(NULL));
+*/
+  srand(12);
 
 }
 
@@ -343,32 +343,42 @@ void loop() {
   //Serial.printf("TEST");
   //delay(500);
   //chip select high
-  spiCommand(hspi, 0b01010101);
+  //spiCommand(hspi, 0b01010101);   //some garbage command for testing, will be commented out or deleted
 
-  int randval;
-  String newstring;
-  String revstring;
+  int cardval = 0;             //indexes cards within activecards[], not indexes of cards in parsed text input
+  char * s;                //character pointer used to convert strings stored in meteadata text files to and from integers
 
-  unsigned int cardidx =0 ;
-  unsigned int newcardcnt = 0;
-  unsigned int totalcards = 0;
-  unsigned int activecardcnt = 0;
+  String newstring;        //pulls string from metadata file \newstatus.txt which in order contains 0 for a new card and 1 for a seen card. no separation between characters.
+  String revstring;        //pulls string from metadata file \revstatus.txt which in order contains the days until review for a card. no separation between characters.
+  String learnstring;      //pulls string from metedata file \learnstatus.txt which in order contains a score of 0-9 for the aptitude of a learner for a card. no separation between characters.
 
-  unsigned int activecards[100];
-  unsigned int finished[100] = {0};
+  unsigned int cardidx =0 ;        //indexes cards from the output of the text parser
+  unsigned int newcardcnt = 0;     //counts how many new cards have been added to activecards[]
+  unsigned int totalcards = 10;    //contains the total cards in the set. will be set by the text parser.
+  unsigned int activecardcnt = 0;  //counts how many cards have been added to activecards[]
+
+  unsigned int activecards[100];   //contains the indexes of all active cards
+  unsigned int finished[100] = {0};//contains info if a card has been finished for the day. 1 is finished, 0 is not finished
+  int revbuffer[2];
+
+  int b1state = 0;
+  int b2state = 0;
+  int b3state = 0;
 
 
-  //get total card number from parser
 
-  unsigned int newstate[totalcards];
-  unsigned int revstate[totalcards];
+  //get total card number from parser, NOT IMPLEMENTED
+
+  unsigned int newstate[totalcards];    //integer array to hold data parsed from newstring
+  unsigned int revstate[totalcards];    //integer array to hold data parsed from revstring
+  unsigned int learnstate[totalcards];  //integer array to hold data parsed from learnstring
 
   if(SD.exists("/newstatus.txt")){                         //check for newstatus file
     newstring = readFile(SD, "/newstatus.txt");     //if it exists, read it
   }
 
   else{
-    writeFile(SD, "/newstatus.txt","");               //otherwise, create it
+    //writeFile(SD, "/newstatus.txt","");               //otherwise, create it
     while(cardidx<totalcards){
       appendFile(SD,"/newstatus.txt","0");             //set all new status to 0
       cardidx+=1;
@@ -376,42 +386,68 @@ void loop() {
     newstring = readFile(SD, "/newstatus.txt");  //get string for newstatus we just created
   }
 
+  cardidx=0;
+
   if(SD.exists("/revstatus.txt")){                         //check for revstatus file
     revstring = readFile(SD, "/revstatus.txt");     //if it exists, read it
   }
 
   else{
-    writeFile(SD, "/revstatus.txt","");               //otherwise, create it
+    //writeFile(SD, "/revstatus.txt","");               //otherwise, create it
     while(cardidx<totalcards){
-      appendFile(SD,"/newstatus.txt","0");             //set all rev status to 0
+      appendFile(SD,"/revstatus.txt","00");             //set all rev status to 00
       cardidx+=1;
     }
     revstring = readFile(SD, "/revstatus.txt");  //get string for newstatus we just created
   }
 
+  cardidx=0;
+
+
+  if(SD.exists("/learnstatus.txt")){                         //check for newstatus file
+    learnstring = readFile(SD, "/learnstatus.txt");     //if it exists, read it
+  }
+
+  else{
+    //writeFile(SD, "/newstatus.txt","");               //otherwise, create it
+    while(cardidx<totalcards){
+      appendFile(SD,"/learnstatus.txt","0");             //set all new status to 0
+      cardidx+=1;
+    }
+    learnstring = readFile(SD, "/learnstatus.txt");  //get string for newstatus we just created
+  }
 
 
   cardidx = 0;
-  char * s;
 
   for ( s=&newstring[0]; *s != '\0'; s++ ){      //for every character in newstring file
-    newstate[cardidx]=atoi(s);                  //read character into integer array
+    newstate[cardidx]=((int) *s) - 48;                  //read character into integer array
     cardidx+=1;
-    s+=1;                                     
   }
 
   cardidx = 0;
 
   for ( s=&revstring[0]; *s != '\0'; s++ ){      //for every character in newstring file
-    revstate[cardidx]=atoi(s);                  //read character into integer array
-    s+=1;               
+    revbuffer[0]=((int) *s) - 48;                        //read first digit
+    s+=1;
+    revbuffer[1]=((int) *s) - 48;                        //read second digit
+    revstate[cardidx]=revbuffer[0]*10+revbuffer[1];    //combine digits into signle integer to store in array
     cardidx+=1;                      
   }
 
+  cardidx=0;
+
+  for ( s=&learnstring[0]; *s != '\0'; s++ ){      //for every character in newstring file
+    learnstate[cardidx]=((int) *s) - 48;                  //read character into integer array
+    cardidx+=1;                      
+  }
+
+  cardidx=0;
 
   while(newcardcnt<20 && cardidx<totalcards){    //while less than 20 new cards selected and still have cards to search
     if (newstate[cardidx]==0){                    //if card is new
       activecards[activecardcnt]=cardidx;        //add to active cards
+      //Serial.println(cardidx);
       activecardcnt+=1;
       newcardcnt+=1;
     }
@@ -430,19 +466,20 @@ void loop() {
 
   //now, activecards[] should contain all the active cards, with activecardcnt telling how many spaces are fill out of the possible 100
 
-  while(randval!=-1){
-      randval=getrandomnumber(finished, activecardcnt);
-      if(randval==-1){
+  while(cardval!=-1){
+      cardval=getrandomnumber(finished, activecardcnt);
+      if(cardval==-1){
         continue;
       }
 
-      cardidx=randval;
-      //show question to card with index cardidx
+
+      //show question to card with index cardval in activecards[], NOT IMPLEMENTED
+      Serial.print("cardidx:");
+      Serial.println(activecards[cardval]);
+      Serial.println(cardval);
 
 
-      int b1state = digitalRead(button1);  //read all buttons
-      int b2state = digitalRead(button2);
-      int b3state = digitalRead(button3);
+      
 
       while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
         delay(10);
@@ -451,16 +488,90 @@ void loop() {
         b3state = digitalRead(button3);
       }
 
-      //update to answer
+      Serial.println("Flipped!");
+      
+      //update to answer (flip the card)
 
       b1state = 0;         //set all button reads back to unpressed
       b2state = 0;
       b3state = 0;
 
-      //TODO: once a button is pressed, move to next card and update if a card is finished or not
+      delay(1000);
+
+      while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
+        delay(10);
+        b1state = digitalRead(button1);
+        b2state = digitalRead(button2);
+        b3state = digitalRead(button3);
+      }
+
+      if(b1state){
+        finished[cardval]=1;
+        Serial.println("Button1");
+        newstate[activecards[cardval]]=1;
+        if(learnstate[activecards[cardval]]<9){
+          learnstate[activecards[cardval]]+=1;
+        }
+        revstate[activecards[cardval]]+=learnstate[activecards[cardval]]*4-3;   //THE -3 IS FOR TESTING, KILL IT LATER
+        //update pet happy!!
+      }
+
+      else if(b3state){
+        //update pet sad
+        if(learnstate[activecards[cardval]]>0){
+          learnstate[activecards[cardval]]-=1;
+        }
+        Serial.println("Button3");
+      }
+
+      else if(b2state){
+        Serial.println("Button2");
+      }
+
+      b1state = 0;         //set all button reads back to unpressed
+      b2state = 0;
+      b3state = 0;
+
+      delay(1000);
+
+
   }
 
-  //TODO: add end state stuff once all cards finished
+  //after all cards completed
+  Serial.println("wrapping up");
+
+  cardidx=0;
+
+  while(cardidx<totalcards){
+    if(revstate[cardidx]>0){          //decrement review counter for all cards
+      revstate[cardidx]-=1;
+      cardidx+=1;
+    }
+  }
+  
+  deleteFile(SD, "/newstatus.txt");
+  deleteFile(SD, "/revstatus.txt");
+  deleteFile(SD, "/learnstatus.txt");
+
+  cardidx=0;
+
+  for (int i = 0; i<totalcards; i++){
+
+    appendFile(SD,"/newstatus.txt",itoa(newstate[cardidx],s,10));
+    if(revstate[cardidx]<10){
+      appendFile(SD,"/revstatus.txt","0");                                  
+    }                               
+    appendFile(SD,"/revstatus.txt",itoa(revstate[cardidx],s,10));                                  
+    appendFile(SD,"/learnstatus.txt",itoa(learnstate[cardidx],s,10));
+    cardidx+=1;                                 
+  }
+
+  Serial.println("Finished");
+
+  while(1){
+    delay(1000);
+  }
+
 
 }
 
@@ -475,7 +586,7 @@ void spiCommand(SPIClass *spi, byte data) {
 
 int getrandomnumber(unsigned int disallowed[], unsigned int maxval) {   
   bool allblocked = true;          //assume all values disallowed
-  for(int i = 0; i<=maxval; i++){   //check every value between 0 and maxval
+  for(int i = 0; i<maxval; i++){   //check every value between 0 and maxval
     if(disallowed[i]==0){          //if any not disallowed, set allblocked false
       allblocked = false;
     }
@@ -485,9 +596,9 @@ int getrandomnumber(unsigned int disallowed[], unsigned int maxval) {
     return -1;
   }
 
-  unsigned int retval=rand()%(maxval+1);          //pick random number from 0-maxval
+  unsigned int retval=rand()%(maxval);          //pick random number from 0-maxval
   while(disallowed[retval]==1){
-    retval=rand()%(maxval+1);
+    retval=rand()%(maxval);
   }
   return retval;
 }
