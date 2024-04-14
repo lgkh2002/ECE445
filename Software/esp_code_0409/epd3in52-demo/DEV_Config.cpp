@@ -32,21 +32,15 @@
 void GPIO_Config(void)
 {
     pinMode(EPD_BUSY_PIN,  INPUT);
-    printf("Busy\r\n");
     pinMode(EPD_RST_PIN , OUTPUT);
     pinMode(EPD_DC_PIN  , OUTPUT);
-    printf("DC\r\n");
     
     pinMode(EPD_SCK_PIN, OUTPUT);
-    printf("SCK\r\n");
     pinMode(EPD_MOSI_PIN, OUTPUT);
-    printf("MOSI\r\n");
     pinMode(EPD_CS_PIN , OUTPUT);
-    printf("CSn\r\n");
-
+    printf("finished config");
     digitalWrite(EPD_CS_PIN , HIGH);
     digitalWrite(EPD_SCK_PIN, LOW);
-    printf("FINISHED GPIO_CON\r\n");
 }
 /******************************************************************************
 function:	Module Initialize, the BCM2835 library and initialize the pins, SPI protocol

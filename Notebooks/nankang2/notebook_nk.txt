@@ -41,3 +41,6 @@
 
 4/9/2024
 - Ressigned the pin in the esp32, still doesn't work
+
+4/13/2024
+- Modify the esp32 screen code, now it is working with a word wrap
