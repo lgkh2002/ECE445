@@ -4,6 +4,34 @@
 #include "imagedata.h"
 #include <stdlib.h>
 
+#define WORDSPERROW 50
+
+char str1[] = "An apple is a round, edible fruit produced by an apple tree (Malus spp., among them the domestic or orchard apple; Malus domestica). Apple trees are cultivated worldwide and are the most widely grown species in the genus Malus. ";
+
+int copySubstring(char* source, char* destination, int start, int end) {
+    int j = 0; // Index for destination
+    int lastSpaceIdx = 0;
+    int lsi = 0;
+
+    //copied and find last space position
+    for (int i = start; i <= end && source[i] != '\0'; i++) {
+        if (source[i] == ' '){
+          lastSpaceIdx = i;
+          lsi = j;
+        }
+        destination[j++] = source[i];
+    }
+    destination[j] = '\0'; // Null-terminate the destination
+
+    if (lsi != -1) {
+        for (int i = lsi; i < end; i++) {
+            destination[i] = '\0';
+        }
+    }
+
+    return lastSpaceIdx;
+}
+
 void setup() {
     Serial.print("e-Paper Clear\r\n ");
     printf("EPD_3IN52_test Demo\r\n");
@@ -33,7 +61,7 @@ void setup() {
     Paint_NewImage(BlackImage, EPD_3IN52_WIDTH, EPD_3IN52_HEIGHT, 270, WHITE);
     Paint_Clear(WHITE);
     
-#if 1   // GC waveform refresh 
+#if 0   // GC waveform refresh 
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
 	Paint_DrawBitMap(gImage_3in52);
@@ -65,21 +93,44 @@ void setup() {
     Paint_Clear(WHITE);
 
     printf("Drawing:BlackImage\r\n");
-    Paint_DrawPoint(10, 80, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 90, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 100, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-    Paint_DrawLine(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawCircle(45, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawCircle(105, 95, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawString_EN(10, 0, "waveshare", &Font16, BLACK, WHITE);
-    Paint_DrawString_EN(10, 20, "hello world", &Font12, WHITE, BLACK);
-    Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
-    Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
+
+    int start = 0;
+    int tot = strlen(str1); // Total length of the string
+    int remain = tot;
+    int row = 0; 
+    int lastSpace = 0;
+    char rowstr[WORDSPERROW];
+
+    while (remain > WORDSPERROW) { // Assuming width = 180 and char width = 7
+        lastSpace = copySubstring(str1, rowstr, start, start + WORDSPERROW - 1);
+        Serial.print(rowstr);
+        Serial.print("\r\n");
+        remain -= lastSpace - start;
+        start = lastSpace + 1;
+        
+        Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+        
+        row++; 
+    }
+    //last line
+    copySubstring(str1, rowstr, start, start + remain);
+    Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+    
+    // Paint_DrawPoint(10, 80, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
+    // Paint_DrawPoint(10, 90, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
+    // Paint_DrawPoint(10, 100, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
+    // Paint_DrawLine(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+    // Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+    // Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+    // Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // Paint_DrawCircle(45, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+    // Paint_DrawCircle(105, 95, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+    // Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+    // Paint_DrawString_EN(10, 0, "waveshare", &Font16, BLACK, WHITE);
+    // Paint_DrawString_EN(10, 20, "hello world", &Font12, WHITE, BLACK);
+    // Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
+    // Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
     printf("EPD_Display\r\n");
     EPD_3IN52_display(BlackImage);
     EPD_3IN52_lut_GC();
@@ -88,7 +139,7 @@ void setup() {
 #endif
 
     printf("Clear...\r\n");
-    EPD_3IN52_Clear();
+    //EPD_3IN52_Clear();
     
     // Sleep & close 5V
     printf("Goto Sleep...\r\n");
