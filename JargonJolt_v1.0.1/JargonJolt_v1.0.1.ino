@@ -67,6 +67,8 @@
 #define button2 9
 #define button3 20
 
+#define WORDSPERROW 50
+
 
 #if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
 #define VSPI 0
@@ -247,6 +249,59 @@ void drawtext(UBYTE * image, int x, int y, char * message){
   EPD_3IN52_lut_GC();
   EPD_3IN52_refresh();
   DEV_Delay_ms(500);
+}
+
+void drawwraptext(UBYTE * image, int x, int y, char * message){
+  Paint_SelectImage(image);
+  Paint_Clear(WHITE);
+
+  int start = 0;
+  int tot = strlen(message); // Total length of the string
+  int remain = tot;
+  int row = 0; 
+  int lastSpace = 0;
+  char rowstr[WORDSPERROW];
+
+  while (remain > WORDSPERROW) { // Assuming width = 180 and char width = 7
+      lastSpace = copySubstring(message, rowstr, start, start + WORDSPERROW - 1);
+      Serial.print(rowstr);
+      Serial.print("\r\n");
+      remain -= lastSpace - start;
+      start = lastSpace + 1;     
+      Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+      row++; 
+  }
+  //last line
+  copySubstring(message, rowstr, start, start + remain);
+  Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+  EPD_3IN52_display(image);
+  EPD_3IN52_lut_GC();
+  EPD_3IN52_refresh();
+  DEV_Delay_ms(500);
+}
+
+int copySubstring(char* source, char* destination, int start, int end) {
+    int j = 0; // Index for destination
+    int lastSpaceIdx = 0;
+    int lsi = 0;
+
+    //copied and find last space position
+    for (int i = start; i <= end && source[i] != '\0'; i++) {
+        if (source[i] == ' '){
+          lastSpaceIdx = i;
+          lsi = j;
+        }
+        destination[j++] = source[i];
+    }
+    destination[j] = '\0'; // Null-terminate the destination
+
+    if (lsi != -1) {
+        for (int i = lsi; i < end; i++) {
+            destination[i] = '\0';
+        }
+    }
+
+    return lastSpaceIdx;
 }
 
 
