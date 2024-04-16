@@ -1,0 +1,60 @@
+Worked a lot on the file format of the SD card.
+
+There will be 3 metadata text files for the flashcard set
+
+newstatus.txt:
+
+stores whether or not a flashcard has been seen by the user yet, or is 'new'. Important because
+a limited number of new cards may be seen per day and new cards are prioritized in the total daily card limit.
+
+is just a string of ones and zeros. Example contents:
+
+11111111111111100000000000000000000
+
+the xth digit is 1 if the xth card in the set has been seen, 0 if it is new.
+
+
+learnstatus.txt:
+
+stores how well the user has learned each card. Important because it affects the number of days until a card should
+be reviewed.
+
+Is a string of digits from 0 to 9. Example contents:
+
+77786787676565564356433443332211100
+
+the xth digit tells how well the user knows the xth card in the set. 0 for not at all, 9 for mastery.
+
+revstatus.txt:
+
+tells how many days/practice sessions remain until a card will be reviewed. 
+
+Is a string of 2 digit numbers. Numbers less than 10 will have a leading 0. Example contents:
+
+232018171819180917061314161118091607200110170605070303010000
+
+the 2*xth and 2*x+1th digit tell the days until review for the xth card. 
+
+Psudocode for SD card initialization:
+
+if newstatus.txt exists:
+	read newstatus.txt
+else:
+	create newstatus.txt initialized to zeros
+	read newstatus.txt
+
+if revstatus.txt exists:
+	read revstatus.txt
+else:
+	create revstatus.txt initialized to 00s		//revstatus is only considered for cards that are NOT new
+	read revstatus.txt		
+
+if learnstatus.txt exists:
+	read learnstatus.txt
+else:
+	create learnstatus.txt initialized to zeros
+	read learnstatus.txt
+
+Will continue with runtime code soon.
+
+

@@ -1,0 +1,22 @@
+001	Ohm's Law	V=IR
+002	Parallel components	components that share nodes on both sides
+003	Series components	components that share one node exclusively
+004	Capacitance	C=q/V
+005	Node	A part of a circuit at the same voltage
+006	MOSFET	metal oxide semiconductor field effect transistor
+007	BJT	Bipolar junction transistor
+008	VRMS	Root mean square voltage
+009	VSWR	voltage standing wave ratio
+010	CW	Continuous wave
+010	FFT	Fast Fourier Transform
+010	Shift-Invarient	Time shifted input -> Time shifted output
+011	Linear	Sum of inputs -> sum of outputs
+012	BIBO	Banded input, banded output
+013	Causal	A system that does not rely on future inputs
+014	Speed of Light	3x10^8 m/s
+015	Vacuum permitivity	8.854x10^-12 C/Vm
+016	SPST	Single Pole Single Throw
+017	PCB	Printed Circuit Board
+018	Electron charge	1.602*10^-19 C
+019	Electron Mass	9.109*10^-31 kg
+020	ECE445	This class
