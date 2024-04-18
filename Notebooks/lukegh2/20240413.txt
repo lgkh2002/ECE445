@@ -1,0 +1,68 @@
+Taking a bit of a detour to work on the screen displays.
+
+We found a good library to use the waveshare digital ink screens that works with the ESP32.
+
+Even so, there's a bit of a learning curve. Here are the steps used to write an image to the screen.
+
+	DEV_Module_Init();  //initialize bitmaps, in seperate file called dev_config.cpp
+
+	EPD_3IN52_Init();	//initalize waveshare
+
+	EPD_3IN52_display_NUM(EPD_3IN52_WHITE);    //ID of device
+	EPD_3IN52_lut_GC();						   //refresh and clear
+	EPD_3IN52_refresh();
+
+	EPD_3IN52_SendCommand(0x50);	//not sure what these do exactly, but they need to be send at initialization
+    EPD_3IN52_SendData(0x17);
+
+    DEV_Delay_ms(500);
+
+    //Create a new image cache, allocate memory for the image to send to the waveshare
+    UBYTE *Image;
+    /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
+    UWORD Imagesize = ((EPD_3IN52_WIDTH % 8 == 0)? (EPD_3IN52_WIDTH / 8 ): (EPD_3IN52_WIDTH / 8 + 1)) * EPD_3IN52_HEIGHT;
+    if((Image = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for black memory...\r\n");
+    }
+
+    printf("Paint_NewImage\r\n");
+    Paint_NewImage(Image, EPD_3IN52_WIDTH, EPD_3IN52_HEIGHT, 270, WHITE);
+    Paint_Clear(WHITE);
+	
+    //At this point, the initialization ends, and these next lines can be repeated any time to draw someting new
+	
+    Paint_SelectImage(Image);
+    Paint_Clear(WHITE);
+	Paint_DrawBitMap(gImage_3in52);	   	//this is drawing a predetermined image, but this line can be replaced by many other 'Paint' functions to draw whatever
+    EPD_3IN52_display(Image);
+    EPD_3IN52_lut_GC();
+    EPD_3IN52_refresh();
+	
+	//Once you're done using the screen, put it to sleep and free the image cache.
+
+	EPD_3IN52_sleep();
+
+	free(Image);
+	Image = NULL;
+	DEV_Delay_ms(2000);//important, at least 2s
+	
+	//NOTE: we did NOT write most of this code, a lot of it was from Waveshare. We just put it together in a convenient way to suit our needs.
+	
+	
+	
+Essentially the steps are:
+
+1. Initialize screen
+2. allocate memory
+3. create new image stored in allocated memory
+4. select image 
+5. draw on image
+6. display image
+7. refresh cycle
+8. sleep screen
+9. free allocated memory
+
+
+Now that the screens work, added some basic things to demonstrate we can draw text whenever we want.
+Now when a flashcard is shown, screen indicates a question/answer should be on screen. Also indicates what button was pressed to progress
+Signals when all flashcards for the day have been answered with confidence and the program ends.

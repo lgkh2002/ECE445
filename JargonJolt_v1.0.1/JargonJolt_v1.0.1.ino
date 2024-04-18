@@ -49,6 +49,9 @@
 #include <stdlib.h>
 
 
+#include "Arduino.h"
+#include "WiFi.h"
+#include "Audio.h"
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
@@ -62,10 +65,15 @@
 #define hmiso 11
 #define hmosi 12
 #define hcs 14
+#define hcs2 47
 
 #define button1 8
 #define button2 9
 #define button3 20
+
+#define I2S_DOUT      19
+#define I2S_BCLK      18
+#define I2S_LRC       17
 
 #define WORDSPERROW 50
 
@@ -76,6 +84,8 @@
 #endif
 
 
+String ssid =     "*******";
+String password = "*******";
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\n", dirname);
@@ -241,17 +251,20 @@ void testFileIO(fs::FS &fs, const char * path){
 }
 
 
-void drawtext(UBYTE * image, int x, int y, char * message){
+void drawtext(UBYTE * image, int x, int y, char * message, int CS){
+  digitalWrite(CS, LOW);
   Paint_SelectImage(image);
   Paint_Clear(WHITE);
-  Paint_DrawString_EN(10, 20, message, &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(x, y, message, &Font12, WHITE, BLACK);
   EPD_3IN52_display(image);
-  EPD_3IN52_lut_GC();
-  EPD_3IN52_refresh();
+  //EPD_3IN52_lut_GC();
+  //EPD_3IN52_refresh();
   DEV_Delay_ms(500);
+  digitalWrite(CS,HIGH);
 }
 
-void drawwraptext(UBYTE * image, int x, int y, char * message){
+void drawwraptext(UBYTE * image, int x, int y, char * message, int CS){
+  digitalWrite(CS, LOW);
   Paint_SelectImage(image);
   Paint_Clear(WHITE);
 
@@ -275,8 +288,9 @@ void drawwraptext(UBYTE * image, int x, int y, char * message){
   copySubstring(message, rowstr, start, start + remain);
   Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
   EPD_3IN52_display(image);
-  EPD_3IN52_lut_GC();
-  EPD_3IN52_refresh();
+  //EPD_3IN52_lut_GC();
+  //EPD_3IN52_refresh();
+  digitalWrite(CS, HIGH);
   DEV_Delay_ms(500);
 }
 
@@ -364,7 +378,7 @@ void setup() {
       Serial.println("Card Mount Failed");
       return;
   }
-digitalWrite(vspi->pinSS(),HIGH);
+  digitalWrite(vspi->pinSS(),HIGH);
 
   uint8_t cardType = SD.cardType();
 
@@ -386,26 +400,11 @@ digitalWrite(vspi->pinSS(),HIGH);
 
   uint64_t cardSize = SD.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
-/*
-  //START OF SD CARD TESTS
-  listDir(SD, "/", 0);
-  createDir(SD, "/mydir");
-  listDir(SD, "/", 0);
-  //removeDir(SD, "/mydir");
-  listDir(SD, "/", 2);
-  writeFile(SD, "/hello.txt", "Hello ");
-  appendFile(SD, "/hello.txt", "World!\n");
-  readFile(SD, "/hello.txt");
-  //deleteFile(SD, "/foo.txt");
-  renameFile(SD, "/hello.txt", "/foo.txt");
-  readFile(SD, "/foo.txt");
-  testFileIO(SD, "/test.txt");
-  Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-  Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
-*/
+
+
   srand(12);
 
-
+  
 
 
 
@@ -424,10 +423,14 @@ void loop() {
   String newstring;        //pulls string from metadata file \newstatus.txt which in order contains 0 for a new card and 1 for a seen card. no separation between characters.
   String revstring;        //pulls string from metadata file \revstatus.txt which in order contains the days until review for a card. no separation between characters.
   String learnstring;      //pulls string from metedata file \learnstatus.txt which in order contains a score of 0-9 for the aptitude of a learner for a card. no separation between characters.
+  String cardstring;       //holds raw data from flashcards.txt
+
+  String question;
+  String answer;
 
   unsigned int cardidx =0 ;        //indexes cards from the output of the text parser
   unsigned int newcardcnt = 0;     //counts how many new cards have been added to activecards[]
-  unsigned int totalcards = 10;    //contains the total cards in the set. will be set by the text parser.
+  unsigned int totalcards = 1;    //contains the total cards in the set. will be set by the text parser.
   unsigned int activecardcnt = 0;  //counts how many cards have been added to activecards[]
 
   unsigned int activecards[100];   //contains the indexes of all active cards
@@ -440,11 +443,7 @@ void loop() {
 
 
 
-  //get total card number from parser, NOT IMPLEMENTED
-
-  unsigned int newstate[totalcards];    //integer array to hold data parsed from newstring
-  unsigned int revstate[totalcards];    //integer array to hold data parsed from revstring
-  unsigned int learnstate[totalcards];  //integer array to hold data parsed from learnstring
+  
 
 
     //START OF WAVESHARE SETUP
@@ -454,6 +453,9 @@ printf("EPD_3IN52_setup\r\n");
     DEV_Module_Init();
 
     printf("e-Paper Init and Clear...\r\n");
+
+    digitalWrite(hcs, LOW);
+    digitalWrite(hcs2, LOW);
     EPD_3IN52_Init();
 
     EPD_3IN52_display_NUM(EPD_3IN52_WHITE);
@@ -462,6 +464,9 @@ printf("EPD_3IN52_setup\r\n");
 
     EPD_3IN52_SendCommand(0x50);
     EPD_3IN52_SendData(0x17);
+
+    digitalWrite(hcs, HIGH);
+    digitalWrite(hcs2, HIGH);
 
     DEV_Delay_ms(500);
 
@@ -474,9 +479,17 @@ printf("EPD_3IN52_setup\r\n");
     }
 
     printf("Paint_NewImage\r\n");
+
+    digitalWrite(hcs, LOW);
+    digitalWrite(hcs2, LOW);
+
     Paint_NewImage(Image, EPD_3IN52_WIDTH, EPD_3IN52_HEIGHT, 270, WHITE);
     Paint_Clear(WHITE);
+
+    digitalWrite(hcs, HIGH);
+    digitalWrite(hcs2, HIGH);
     
+/*
 #if 1   // GC waveform refresh 
     Paint_SelectImage(Image);
     Paint_Clear(WHITE);
@@ -486,6 +499,7 @@ printf("EPD_3IN52_setup\r\n");
     EPD_3IN52_refresh();
     
 #endif
+*/
 
 /*
 #if 0  //DU waveform refresh
@@ -548,7 +562,30 @@ printf("EPD_3IN52_setup\r\n");
 */
 
 
+  if(SD.exists("/flashcards.txt")){
+    cardstring = readFile(SD, "/flashcards.txt"); 
+  }
 
+  else{
+    drawtext(Image, 200,200, "Please add flashcard file to SD card, then restart the device", hcs);
+    digitalWrite(hcs,LOW);
+    EPD_3IN52_lut_GC();
+    EPD_3IN52_refresh();
+    digitalWrite(hcs,HIGH);
+    while(1){
+      delay(1000);
+    }
+  }
+
+  for ( s=&cardstring[0]; *s!='\0'; s++){
+    if(*s=='\n'){
+      totalcards+=1;
+    }
+  }
+
+  unsigned int newstate[totalcards];    //integer array to hold data parsed from newstring
+  unsigned int revstate[totalcards];    //integer array to hold data parsed from revstring
+  unsigned int learnstate[totalcards];  //integer array to hold data parsed from learnstring
 
 
   if(SD.exists("/newstatus.txt")){                         //check for newstatus file
@@ -609,7 +646,7 @@ printf("EPD_3IN52_setup\r\n");
     revbuffer[0]=((int) *s) - 48;                        //read first digit
     s+=1;
     revbuffer[1]=((int) *s) - 48;                        //read second digit
-    revstate[cardidx]=revbuffer[0]*10+revbuffer[1];    //combine digits into signle integer to store in array
+    revstate[cardidx]=revbuffer[0]*10+revbuffer[1];    //combine digits into single integer to store in array
     cardidx+=1;                      
   }
 
@@ -619,6 +656,7 @@ printf("EPD_3IN52_setup\r\n");
     learnstate[cardidx]=((int) *s) - 48;                  //read character into integer array
     cardidx+=1;                      
   }
+
 
   cardidx=0;
 
@@ -655,8 +693,16 @@ printf("EPD_3IN52_setup\r\n");
       Serial.print("cardidx:");
       Serial.println(activecards[cardval]);
       Serial.println(cardval);
-      drawtext(Image, 10 ,20,"SHOW QUESTION");
+      question = getquestion(activecards[cardval],cardstring);
+      drawtext(Image, 100 ,100, &(question[0]), hcs);
+      drawtext(Image,100,100, "ayyyyy", hcs2);
+      digitalWrite(hcs,LOW);
+      digitalWrite(hcs2,LOW);
 
+      EPD_3IN52_lut_GC();
+      EPD_3IN52_refresh();
+      digitalWrite(hcs,HIGH);
+      digitalWrite(hcs2,HIGH);
 
 
       
@@ -669,10 +715,16 @@ printf("EPD_3IN52_setup\r\n");
       }
 
       Serial.println("Flipped!");
-      drawtext(Image, 10 ,20,"Flipped!");
+      answer=getanswer(activecards[cardval],cardstring);
+      drawtext(Image, 100 ,100,&(answer[0]), hcs);
+      digitalWrite(hcs,LOW);
+      EPD_3IN52_lut_GC();
+      EPD_3IN52_refresh();
+      digitalWrite(hcs,HIGH);
+
+
 
       
-      //update to answer (flip the card)
 
       b1state = 0;         //set all button reads back to unpressed
       b2state = 0;
@@ -690,7 +742,11 @@ printf("EPD_3IN52_setup\r\n");
       if(b1state){
         finished[cardval]=1;
         Serial.println("Button1");
-        drawtext(Image, 10 ,20,"Button 1");
+        drawtext(Image, 10 ,20,"Button 1", hcs);
+        digitalWrite(hcs,LOW);
+        EPD_3IN52_lut_GC();
+        EPD_3IN52_refresh();
+        digitalWrite(hcs,HIGH);
         newstate[activecards[cardval]]=1;
         if(learnstate[activecards[cardval]]<9){
           learnstate[activecards[cardval]]+=1;
@@ -705,13 +761,21 @@ printf("EPD_3IN52_setup\r\n");
           learnstate[activecards[cardval]]-=1;
         }
         Serial.println("Button3");
-        drawtext(Image, 10 ,20,"Button 3");
+        drawtext(Image, 10 ,20,"Button 3", hcs);
+        digitalWrite(hcs,LOW);
+        EPD_3IN52_lut_GC();
+        EPD_3IN52_refresh();
+        digitalWrite(hcs,HIGH);
 
       }
 
       else if(b2state){
         Serial.println("Button2");
-        drawtext(Image, 10 ,20,"Button 2");
+        drawtext(Image, 10 ,20,"Button 2", hcs);
+        digitalWrite(hcs,LOW);
+        EPD_3IN52_lut_GC();
+        EPD_3IN52_refresh();
+        digitalWrite(hcs,HIGH);
 
       }
 
@@ -732,8 +796,8 @@ printf("EPD_3IN52_setup\r\n");
   while(cardidx<totalcards){
     if(revstate[cardidx]>0){          //decrement review counter for all cards
       revstate[cardidx]-=1;
-      cardidx+=1;
     }
+    cardidx+=1;
   }
   
   deleteFile(SD, "/newstatus.txt");
@@ -743,7 +807,6 @@ printf("EPD_3IN52_setup\r\n");
   cardidx=0;
 
   for (int i = 0; i<totalcards; i++){
-
     appendFile(SD,"/newstatus.txt",itoa(newstate[cardidx],s,10));
     if(revstate[cardidx]<10){
       appendFile(SD,"/revstatus.txt","0");                                  
@@ -754,11 +817,19 @@ printf("EPD_3IN52_setup\r\n");
   }
 
   Serial.println("Finished");
-  drawtext(Image, 10 ,20,"Finished");
+  drawtext(Image, 10 ,20,"Finished", hcs);
+  digitalWrite(hcs,LOW);
+  EPD_3IN52_lut_GC();
+  EPD_3IN52_refresh();
+  digitalWrite(hcs,HIGH);
 
   // Sleep & close 5V
   printf("Goto Sleep...\r\n");
+  digitalWrite(hcs, LOW);
+  digitalWrite(hcs2, LOW);
   EPD_3IN52_sleep();
+  digitalWrite(hcs, HIGH);
+  digitalWrite(hcs2, HIGH);
 
   free(Image);
   Image = NULL;
@@ -801,3 +872,56 @@ int getrandomnumber(unsigned int disallowed[], unsigned int maxval) {
   }
   return retval;
 }
+
+String getquestion(unsigned int cardidx, String cards){
+  char * c;
+  c = &cards[0];
+  String question;
+
+  for(int cardnum = 0; cardnum<cardidx; cardnum++){
+    while(*c != '\n'){
+      c+=1;               //step to end of the line
+    }
+    c+=1;
+  }
+
+  //c should now point to start of question
+
+  while(*c != 9){
+    question+=*c;
+    c+=1;
+  }
+
+  return question;
+
+}
+
+String getanswer(unsigned int cardidx, String cards){
+  char * c;
+  c = &cards[0];
+  String answer;
+
+  for(int cardnum = 0; cardnum<cardidx; cardnum++){
+    while(*c != '\n'){
+      c+=1;               //step to end of the line
+    }
+    c+=1;
+  }
+
+  while(*c != 9){
+    c+=1;
+  }
+
+  c+=1;
+
+  //c should now point to start of answer
+
+  while(*c != 9 && *c != '\n' && *c != 13 && *c != 10){
+    answer+=*c;
+    c+=1;
+  }
+
+  return answer;
+
+}
+
