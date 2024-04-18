@@ -77,6 +77,11 @@
 
 #define WORDSPERROW 50
 
+#define PET_EXCELLENT 0
+#define PET_WELLDONE 1
+#define PET_NORMAL 2
+#define PET_BAD 3
+#define PET_TERRIBLE 4
 
 #if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
 #define VSPI 0
@@ -292,6 +297,32 @@ void drawwraptext(UBYTE * image, int x, int y, char * message, int CS){
   //EPD_3IN52_refresh();
   digitalWrite(CS, HIGH);
   DEV_Delay_ms(500);
+}
+
+void drawpet(UBYTE * image, UWORD status){
+  Paint_SelectImage(image);
+  Paint_Clear(WHITE);
+  switch (status){
+    case 0:
+        Paint_DrawBitMap(gImage_excellent);
+        break;
+    case 1:
+        Paint_DrawBitMap(gImage_welldone);
+        break;
+    case 2:
+        Paint_DrawBitMap(gImage_normal);
+        break;
+    case 3:
+        Paint_DrawBitMap(gImage_bad);
+        break;
+    case 4:
+        Paint_DrawBitMap(gImage_terrible);
+        break;
+  }
+  EPD_3IN52_display(image);
+  EPD_3IN52_lut_DU();
+  EPD_3IN52_refresh();
+  DEV_Delay_ms(1000);
 }
 
 int copySubstring(char* source, char* destination, int start, int end) {
