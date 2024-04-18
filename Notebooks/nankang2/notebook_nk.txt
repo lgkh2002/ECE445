@@ -44,3 +44,6 @@
 
 4/13/2024
 - Modify the esp32 screen code, now it is working with a word wrap
+
+4/17/2024
+- Deal with pet image, screen can display differet pet emotion images

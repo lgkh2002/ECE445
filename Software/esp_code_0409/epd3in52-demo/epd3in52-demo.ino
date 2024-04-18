@@ -6,7 +6,40 @@
 
 #define WORDSPERROW 50
 
+#define PET_EXCELLENT 0
+#define PET_WELLDONE 1
+#define PET_NORMAL 2
+#define PET_BAD 3
+#define PET_TERRIBLE 4
+
 char str1[] = "An apple is a round, edible fruit produced by an apple tree (Malus spp., among them the domestic or orchard apple; Malus domestica). Apple trees are cultivated worldwide and are the most widely grown species in the genus Malus. ";
+
+void drawpet(UBYTE * image, UWORD status){
+  Paint_SelectImage(image);
+  Paint_Clear(WHITE);
+  switch (status){
+    case 0:
+        Paint_DrawBitMap(gImage_excellent);
+        break;
+    case 1:
+        Paint_DrawBitMap(gImage_welldone);
+        break;
+    case 2:
+        Paint_DrawBitMap(gImage_normal);
+        break;
+    case 3:
+        Paint_DrawBitMap(gImage_bad);
+        break;
+    case 4:
+        Paint_DrawBitMap(gImage_terrible);
+        break;
+  }
+  EPD_3IN52_display(image);
+  EPD_3IN52_lut_DU();
+  EPD_3IN52_refresh();
+  DEV_Delay_ms(1000);
+}
+
 
 int copySubstring(char* source, char* destination, int start, int end) {
     int j = 0; // Index for destination
@@ -74,20 +107,64 @@ void setup() {
 
 #endif
 
-#if 0  //DU waveform refresh
-    printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
-    Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-    Paint_DrawBitMap(gImage_3in52);
-		
-    EPD_3IN52_display(BlackImage);
-    EPD_3IN52_lut_DU();
-    EPD_3IN52_refresh();
-    DEV_Delay_ms(2000);
-
+#if 1  //DU waveform refresh
+    // printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
+    // Paint_SelectImage(BlackImage);
+    // Paint_Clear(WHITE);
+    // Paint_DrawBitMap(gImage_excellent);
+    // EPD_3IN52_display(BlackImage);
+    // EPD_3IN52_lut_DU();
+    // EPD_3IN52_refresh();
+    // DEV_Delay_ms(1000);
+    drawpet(BlackImage, PET_BAD);
 #endif
 
-#if 1 
+// #if 1  //DU waveform refresh
+//     printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
+//     Paint_SelectImage(BlackImage);
+//     Paint_Clear(WHITE);
+//     Paint_DrawBitMap(gImage_welldone);
+//     EPD_3IN52_display(BlackImage);
+//     EPD_3IN52_lut_DU();
+//     EPD_3IN52_refresh();
+//     DEV_Delay_ms(1000);
+// #endif
+
+// #if 1  //DU waveform refresh
+//     printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
+//     Paint_SelectImage(BlackImage);
+//     Paint_Clear(WHITE);
+//     Paint_DrawBitMap(gImage_normal);
+//     EPD_3IN52_display(BlackImage);
+//     EPD_3IN52_lut_DU();
+//     EPD_3IN52_refresh();
+//     DEV_Delay_ms(1000);
+// #endif
+
+// #if 1  //DU waveform refresh
+//     printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
+//     Paint_SelectImage(BlackImage);
+//     Paint_Clear(WHITE);
+//     Paint_DrawBitMap(gImage_bad);
+//     EPD_3IN52_display(BlackImage);
+//     EPD_3IN52_lut_DU();
+//     EPD_3IN52_refresh();
+//     DEV_Delay_ms(1000);
+// #endif
+
+// #if 1  //DU waveform refresh
+//     printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
+//     Paint_SelectImage(BlackImage);
+//     Paint_Clear(WHITE);
+//     Paint_DrawBitMap(gImage_terrible);
+//     EPD_3IN52_display(BlackImage);
+//     EPD_3IN52_lut_DU();
+//     EPD_3IN52_refresh();
+//     DEV_Delay_ms(2000);
+// #endif
+
+
+#if 0 
     printf("SelectImage:BlackImage\r\n");
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
