@@ -56,6 +56,7 @@
 #include "SD.h"
 #include "SPI.h"
 
+
 #define vsck 40
 #define vmiso 41
 #define vmosi 42
@@ -89,8 +90,23 @@
 #endif
 
 
-String ssid =     "*******";
-String password = "*******";
+String ssid =     "Luke_samsung";
+String password = "jvpb9532";
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = -21600;
+const int   daylightOffset_sec = 3600;
+
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
+
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\n", dirname);
@@ -299,7 +315,8 @@ void drawwraptext(UBYTE * image, int x, int y, char * message, int CS){
   DEV_Delay_ms(500);
 }
 
-void drawpet(UBYTE * image, UWORD status){
+void drawpet(UBYTE * image, UWORD status, int CS){
+  digitalWrite(CS,LOW);
   Paint_SelectImage(image);
   Paint_Clear(WHITE);
   switch (status){
@@ -320,9 +337,8 @@ void drawpet(UBYTE * image, UWORD status){
         break;
   }
   EPD_3IN52_display(image);
-  EPD_3IN52_lut_DU();
-  EPD_3IN52_refresh();
   DEV_Delay_ms(1000);
+  digitalWrite(CS,HIGH);
 }
 
 int copySubstring(char* source, char* destination, int start, int end) {
@@ -405,7 +421,7 @@ void setup() {
   Serial.println(cs);*/
 
   digitalWrite(vspi->pinSS(), LOW);
-  if(!SD.begin(vspi->pinSS(),*vspi)){
+  if(!SD.begin(vspi->pinSS(),*vspi,4000000, "/sd", 10)){
       Serial.println("Card Mount Failed");
       return;
   }
@@ -433,10 +449,13 @@ void setup() {
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
 
-  srand(12);
-
-  
-
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
 
 
 }
@@ -455,6 +474,7 @@ void loop() {
   String revstring;        //pulls string from metadata file \revstatus.txt which in order contains the days until review for a card. no separation between characters.
   String learnstring;      //pulls string from metedata file \learnstatus.txt which in order contains a score of 0-9 for the aptitude of a learner for a card. no separation between characters.
   String cardstring;       //holds raw data from flashcards.txt
+  String datestring;
 
   String question;
   String answer;
@@ -467,15 +487,25 @@ void loop() {
   unsigned int activecards[100];   //contains the indexes of all active cards
   unsigned int finished[100] = {0};//contains info if a card has been finished for the day. 1 is finished, 0 is not finished
   int revbuffer[2];
+  int day;
+  int dayspast;
+  int pethealth = 0;
 
   int b1state = 0;
   int b2state = 0;
   int b3state = 0;
 
-
-
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    day = 0;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   
+  day=(timeinfo.tm_yday+365*timeinfo.tm_year);
 
+  srand(day);
 
     //START OF WAVESHARE SETUP
 
@@ -592,9 +622,31 @@ printf("EPD_3IN52_setup\r\n");
 
 */
 
+  if(SD.exists("/dateinfo.txt")){
+    datestring=readFile(SD,"/datainfo.txt");
+    dayspast=stoi(datestring);
+  }
+  else{
+    dayspast=day-1
+  }
+
+  dayspast=day-dayspast;
+
+  if(!dayspast){
+    drawtext(Image, 50,100, "Finished for the day, come back tomorrow!", hcs);
+    digitalWrite(hcs,LOW);
+    EPD_3IN52_lut_GC();
+    EPD_3IN52_refresh();
+    digitalWrite(hcs,HIGH);
+    while(1){
+      delay(1000);
+    }
+  }
+
 
   if(SD.exists("/flashcards.txt")){
     cardstring = readFile(SD, "/flashcards.txt"); 
+    stoi(cardstring)
   }
 
   else{
@@ -726,14 +778,10 @@ printf("EPD_3IN52_setup\r\n");
       Serial.println(cardval);
       question = getquestion(activecards[cardval],cardstring);
       drawtext(Image, 100 ,100, &(question[0]), hcs);
-      drawtext(Image,100,100, "ayyyyy", hcs2);
       digitalWrite(hcs,LOW);
-      digitalWrite(hcs2,LOW);
-
       EPD_3IN52_lut_GC();
       EPD_3IN52_refresh();
       digitalWrite(hcs,HIGH);
-      digitalWrite(hcs2,HIGH);
 
 
       
@@ -773,17 +821,13 @@ printf("EPD_3IN52_setup\r\n");
       if(b1state){
         finished[cardval]=1;
         Serial.println("Button1");
-        drawtext(Image, 10 ,20,"Button 1", hcs);
-        digitalWrite(hcs,LOW);
-        EPD_3IN52_lut_GC();
-        EPD_3IN52_refresh();
-        digitalWrite(hcs,HIGH);
         newstate[activecards[cardval]]=1;
         if(learnstate[activecards[cardval]]<9){
           learnstate[activecards[cardval]]+=1;
         }
         revstate[activecards[cardval]]+=learnstate[activecards[cardval]]*4-3;   //THE -3 IS FOR TESTING, KILL IT LATER
-        //update pet happy!!
+        drawtext(Image, 10 ,20,"Button 1", hcs);
+        drawpet(Image, PET_WELLDONE, hcs2);
       }
 
       else if(b3state){
@@ -793,22 +837,22 @@ printf("EPD_3IN52_setup\r\n");
         }
         Serial.println("Button3");
         drawtext(Image, 10 ,20,"Button 3", hcs);
-        digitalWrite(hcs,LOW);
-        EPD_3IN52_lut_GC();
-        EPD_3IN52_refresh();
-        digitalWrite(hcs,HIGH);
+        drawpet(Image, PET_BAD, hcs2);
 
       }
 
       else if(b2state){
         Serial.println("Button2");
         drawtext(Image, 10 ,20,"Button 2", hcs);
-        digitalWrite(hcs,LOW);
-        EPD_3IN52_lut_GC();
-        EPD_3IN52_refresh();
-        digitalWrite(hcs,HIGH);
-
+        drawpet(Image, PET_NORMAL, hcs2);
       }
+
+      digitalWrite(hcs,LOW);
+      digitalWrite(hcs2,LOW);
+      EPD_3IN52_lut_GC();
+      EPD_3IN52_refresh();
+      digitalWrite(hcs2,HIGH);
+      digitalWrite(hcs,HIGH);
 
       b1state = 0;         //set all button reads back to unpressed
       b2state = 0;
