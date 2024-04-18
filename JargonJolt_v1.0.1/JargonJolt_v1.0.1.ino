@@ -623,16 +623,25 @@ printf("EPD_3IN52_setup\r\n");
 */
 
   if(SD.exists("/dateinfo.txt")){
-    datestring=readFile(SD,"/datainfo.txt");
-    dayspast=stoi(datestring);
+    datestring=readFile(SD,"/dateinfo.txt");
+    s=&datestring[0];
+    dayspast+=10000* *s;
+    s+=1;
+    dayspast+=1000* *s;
+    s+=1;
+    dayspast+=100* *s;
+    s+=1;
+    dayspast+=10* *s;
+    s+=1;
+    dayspast+=*s;
   }
   else{
-    dayspast=day-1
+    dayspast=day-1;
   }
 
   dayspast=day-dayspast;
 
-  if(!dayspast){
+  if(dayspast==0){
     drawtext(Image, 50,100, "Finished for the day, come back tomorrow!", hcs);
     digitalWrite(hcs,LOW);
     EPD_3IN52_lut_GC();
@@ -646,7 +655,6 @@ printf("EPD_3IN52_setup\r\n");
 
   if(SD.exists("/flashcards.txt")){
     cardstring = readFile(SD, "/flashcards.txt"); 
-    stoi(cardstring)
   }
 
   else{
@@ -878,6 +886,7 @@ printf("EPD_3IN52_setup\r\n");
   deleteFile(SD, "/newstatus.txt");
   deleteFile(SD, "/revstatus.txt");
   deleteFile(SD, "/learnstatus.txt");
+  deleteFile(SD, "/dateinfo.txt");
 
   cardidx=0;
 
@@ -890,6 +899,8 @@ printf("EPD_3IN52_setup\r\n");
     appendFile(SD,"/learnstatus.txt",itoa(learnstate[cardidx],s,10));
     cardidx+=1;                                 
   }
+
+  appendFile(SD,"/dateinfo.txt", itoa(day,s,10));
 
   Serial.println("Finished");
   drawtext(Image, 10 ,20,"Finished", hcs);
