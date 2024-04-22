@@ -78,11 +78,13 @@
 
 #define WORDSPERROW 50
 
-#define PET_EXCELLENT 0
-#define PET_WELLDONE 1
-#define PET_NORMAL 2
-#define PET_BAD 3
-#define PET_TERRIBLE 4
+#define PET_WELLDONE 0
+#define PET_NORMAL 1
+#define PET_BAD 2
+#define PET_HEALTH1 3
+#define PET_HEALTH2 4
+#define PET_HEALTH3 5
+#define PET_HEALTH4 6
 
 #if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
 #define VSPI 0
@@ -321,19 +323,25 @@ void drawpet(UBYTE * image, UWORD status, int CS){
   Paint_Clear(WHITE);
   switch (status){
     case 0:
-        Paint_DrawBitMap(gImage_excellent);
-        break;
-    case 1:
         Paint_DrawBitMap(gImage_welldone);
         break;
-    case 2:
+    case 1:
         Paint_DrawBitMap(gImage_normal);
         break;
-    case 3:
+    case 2:
         Paint_DrawBitMap(gImage_bad);
         break;
+    case 3:
+        Paint_DrawBitMap(gImage_hs1);
+        break;
     case 4:
-        Paint_DrawBitMap(gImage_terrible);
+        Paint_DrawBitMap(gImage_hs2);
+        break;
+    case 5:
+        Paint_DrawBitMap(gImage_hs3);
+        break;
+    case 6:
+        Paint_DrawBitMap(gImage_hs4);
         break;
   }
   EPD_3IN52_display(image);

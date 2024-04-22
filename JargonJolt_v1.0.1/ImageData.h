@@ -33,10 +33,12 @@
 #define _IMAGEDATA_H_
 
 extern const unsigned char gImage_3in52[];
-extern const unsigned char gImage_excellent[];
 extern const unsigned char gImage_welldone[];
 extern const unsigned char gImage_normal[];
 extern const unsigned char gImage_bad[];
-extern const unsigned char gImage_terrible[];
+extern const unsigned char gImage_hs1[];
+extern const unsigned char gImage_hs2[];
+extern const unsigned char gImage_hs3[];
+extern const unsigned char gImage_hs4[];
 #endif
 /* FILE END */
