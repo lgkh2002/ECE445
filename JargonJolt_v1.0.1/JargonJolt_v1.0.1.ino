@@ -483,6 +483,7 @@ void loop() {
   String learnstring;      //pulls string from metedata file \learnstatus.txt which in order contains a score of 0-9 for the aptitude of a learner for a card. no separation between characters.
   String cardstring;       //holds raw data from flashcards.txt
   String datestring;
+  String healthstring;
 
   String question;
   String answer;
@@ -496,7 +497,7 @@ void loop() {
   unsigned int finished[100] = {0};//contains info if a card has been finished for the day. 1 is finished, 0 is not finished
   int revbuffer[2];
   int day;
-  int dayspast;
+  int dayspast=0;
   int pethealth = 0;
 
   int b1state = 0;
@@ -512,6 +513,7 @@ void loop() {
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   
   day=(timeinfo.tm_yday+365*timeinfo.tm_year);
+  Serial.print(day);
 
   srand(day);
 
@@ -629,23 +631,32 @@ printf("EPD_3IN52_setup\r\n");
     printf("close 5V, Module enters 0 power consumption ...\r\n");
 
 */
+  if(SD.exists("/pethealth.txt")){
+    healthstring=readFile(SD,"/pethealth.txt");
+    s=&healthstring[0];
+    pethealth=*s;
+  }
+  else{
+    pethealth=5;
+  }
 
   if(SD.exists("/dateinfo.txt")){
     datestring=readFile(SD,"/dateinfo.txt");
     s=&datestring[0];
-    dayspast+=10000* *s;
+    dayspast+=10000* (((int) *s)-48);
     s+=1;
-    dayspast+=1000* *s;
+    dayspast+=1000* (((int) *s)-48);
     s+=1;
-    dayspast+=100* *s;
+    dayspast+=100* (((int) *s)-48);
     s+=1;
-    dayspast+=10* *s;
+    dayspast+=10* (((int) *s)-48);
     s+=1;
-    dayspast+=*s;
+    dayspast+=(((int) *s)-48);
   }
   else{
     dayspast=day-1;
   }
+  Serial.println(dayspast);
 
   dayspast=day-dayspast;
 
@@ -658,6 +669,14 @@ printf("EPD_3IN52_setup\r\n");
     while(1){
       delay(1000);
     }
+  }
+
+  pethealth+=2-dayspast;
+  if(pethealth<0){
+    pethealth=0;
+  }
+  if(pethealth>9){
+    pethealth=9;
   }
 
 
@@ -779,6 +798,31 @@ printf("EPD_3IN52_setup\r\n");
     cardidx+=1;
   }
 
+  if(pethealth<3){
+    drawpet(Image,PET_HEALTH4,hcs2);
+    drawtext(Image, 100,100,"Keep up daily practice!",hcs);
+  }
+  else if (pethealth<4){
+    drawpet(Image,PET_HEALTH3,hcs2);
+    drawtext(Image,100,100,"Keep on practicing!",hcs);
+  }
+  else if (pethealth<8){
+    drawpet(Image,PET_HEALTH2,hcs2);
+    drawtext(Image,100,100,"Good work! Keep it up!",hcs);
+  }
+  else{
+    drawpet(Image,PET_HEALTH1,hcs2);
+    drawtext(Image,100,100,"Great Work! So Happy!",hcs);
+  }
+
+  digitalWrite(hcs,LOW);
+  digitalWrite(hcs2,LOW);
+  EPD_3IN52_lut_GC();
+  EPD_3IN52_refresh();
+  digitalWrite(hcs2,HIGH);
+  digitalWrite(hcs,HIGH);
+
+  delay(2000);
   //now, activecards[] should contain all the active cards, with activecardcnt telling how many spaces are fill out of the possible 100
 
   while(cardval!=-1){
@@ -834,25 +878,25 @@ printf("EPD_3IN52_setup\r\n");
         b3state = digitalRead(button3);
       }
 
-      if(b1state){
+      if(b3state){
         finished[cardval]=1;
-        Serial.println("Button1");
+        Serial.println("Button3");
         newstate[activecards[cardval]]=1;
         if(learnstate[activecards[cardval]]<9){
           learnstate[activecards[cardval]]+=1;
         }
         revstate[activecards[cardval]]+=learnstate[activecards[cardval]]*4-3;   //THE -3 IS FOR TESTING, KILL IT LATER
-        drawtext(Image, 10 ,20,"Button 1", hcs);
+        drawtext(Image, 10 ,20,"Button 3", hcs);
         drawpet(Image, PET_WELLDONE, hcs2);
       }
 
-      else if(b3state){
+      else if(b1state){
         //update pet sad
         if(learnstate[activecards[cardval]]>0){
           learnstate[activecards[cardval]]-=1;
         }
-        Serial.println("Button3");
-        drawtext(Image, 10 ,20,"Button 3", hcs);
+        Serial.println("Button1");
+        drawtext(Image, 10 ,20,"Button 1", hcs);
         drawpet(Image, PET_BAD, hcs2);
 
       }
@@ -895,6 +939,7 @@ printf("EPD_3IN52_setup\r\n");
   deleteFile(SD, "/revstatus.txt");
   deleteFile(SD, "/learnstatus.txt");
   deleteFile(SD, "/dateinfo.txt");
+  deleteFile(SD, "/pethealth.txt");
 
   cardidx=0;
 
@@ -909,12 +954,29 @@ printf("EPD_3IN52_setup\r\n");
   }
 
   appendFile(SD,"/dateinfo.txt", itoa(day,s,10));
+  appendFile(SD,"/pethealth.txt",itoa(pethealth,s,10));
 
   Serial.println("Finished");
-  drawtext(Image, 10 ,20,"Finished", hcs);
+  if(pethealth<3){
+    drawpet(Image,PET_HEALTH4,hcs2);
+  }
+  else if (pethealth<4){
+    drawpet(Image,PET_HEALTH3,hcs2);
+  }
+  else if (pethealth<8){
+    drawpet(Image,PET_HEALTH2,hcs2);
+  }
+  else{
+    drawpet(Image,PET_HEALTH1,hcs2);
+  }
+
+  drawtext(Image,100,100,"Come back tomorrow to keep practicing!",hcs);
+
   digitalWrite(hcs,LOW);
+  digitalWrite(hcs2,LOW);
   EPD_3IN52_lut_GC();
   EPD_3IN52_refresh();
+  digitalWrite(hcs2,HIGH);
   digitalWrite(hcs,HIGH);
 
   // Sleep & close 5V
