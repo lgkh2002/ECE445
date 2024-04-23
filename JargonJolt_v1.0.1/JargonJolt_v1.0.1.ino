@@ -98,6 +98,7 @@ String password = "jvpb9532";
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -21600;
 const int   daylightOffset_sec = 3600;
+Audio audio;
 
 void printLocalTime()
 {
@@ -465,15 +466,11 @@ void setup() {
   }
   Serial.println(" CONNECTED");
 
-
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  audio.setVolume(21); // default 0...21
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  //Serial.printf("TEST");
-  //delay(500);
-  //chip select high
-  //spiCommand(hspi, 0b01010101);   //some garbage command for testing, will be commented out or deleted
 
   int cardval = 0;             //indexes cards within activecards[], not indexes of cards in parsed text input
   char * s;                //character pointer used to convert strings stored in meteadata text files to and from integers
@@ -517,7 +514,7 @@ void loop() {
 
   srand(day);
 
-    //START OF WAVESHARE SETUP
+    // START OF WAVESHARE SETUP
 
 
 printf("EPD_3IN52_setup\r\n");
@@ -543,7 +540,7 @@ printf("EPD_3IN52_setup\r\n");
 
     //Create a new image cache
     UBYTE *Image;
-    /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
+    // you have to edit the startup_stm32fxxx.s file and set a big enough heap size
     UWORD Imagesize = ((EPD_3IN52_WIDTH % 8 == 0)? (EPD_3IN52_WIDTH / 8 ): (EPD_3IN52_WIDTH / 8 + 1)) * EPD_3IN52_HEIGHT;
     if((Image = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for black memory...\r\n");
@@ -560,77 +557,7 @@ printf("EPD_3IN52_setup\r\n");
     digitalWrite(hcs, HIGH);
     digitalWrite(hcs2, HIGH);
     
-/*
-#if 1   // GC waveform refresh 
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-//	  Paint_DrawBitMap(gImage_3in52);	
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_GC();
-    EPD_3IN52_refresh();
-    
-#endif
-*/
 
-/*
-#if 0  //DU waveform refresh
-    printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-    Paint_DrawBitMap(gImage_3in52);
-		
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_DU();
-    EPD_3IN52_refresh();
-    DEV_Delay_ms(2000);
-
-#endif
-*/
-
-/*
-#if 1 
-    printf("SelectImage:Image\r\n");
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-
-    printf("Drawing:Image\r\n");
-    Paint_DrawPoint(10, 80, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 90, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 100, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-    Paint_DrawLine(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawCircle(45, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawCircle(105, 95, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawString_EN(10, 0, "waveshare", &Font16, BLACK, WHITE);
-    Paint_DrawString_EN(10, 20, "hello world", &Font12, WHITE, BLACK);
-    Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
-    Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
-    printf("EPD_Display\r\n");
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_GC();
-    EPD_3IN52_refresh();
-    DEV_Delay_ms(2000);
-#endif
-*/
-
-/*
-    printf("Clear...\r\n");
-    EPD_3IN52_Clear();
-    
-    // Sleep & close 5V
-    printf("Goto Sleep...\r\n");
-    EPD_3IN52_sleep();
-
-    free(Image);
-    Image = NULL;
-    DEV_Delay_ms(2000);//important, at least 2s
-    printf("close 5V, Module enters 0 power consumption ...\r\n");
-
-*/
   if(SD.exists("/pethealth.txt")){
     healthstring=readFile(SD,"/pethealth.txt");
     s=&healthstring[0];
@@ -997,7 +924,6 @@ printf("EPD_3IN52_setup\r\n");
   while(1){
     delay(1000);
   }
-
 
 }
 
