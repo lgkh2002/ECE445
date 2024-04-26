@@ -30,7 +30,7 @@
 - Be able to print text and image on the screen
 
 4/3/2024
-- Measure parts dimension and adjust the inner height of the enclosure
+- Measure parts dimension and adjust the inner height and holder position of the enclosure
 
 4/6/2024
 - Submitted the enclosure 3D model printing request
@@ -47,3 +47,8 @@
 
 4/17/2024
 - Deal with pet image, screen can display differet pet emotion images
+
+4/22/2024
+- Polish the printed enclosure and make sure every parts fit in the enclosure
+- Assemble everything inside the enclosure
+- Add more pet images for two types of status
