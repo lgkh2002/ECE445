@@ -98,6 +98,7 @@ String password = "jvpb9532";
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -21600;
 const int   daylightOffset_sec = 3600;
+Audio audio;
 
 void printLocalTime()
 {
@@ -278,7 +279,23 @@ void drawtext(UBYTE * image, int x, int y, char * message, int CS){
   digitalWrite(CS, LOW);
   Paint_SelectImage(image);
   Paint_Clear(WHITE);
-  Paint_DrawString_EN(x, y, message, &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(x, y, message, &Font16, WHITE, BLACK);
+  EPD_3IN52_display(image);
+  //EPD_3IN52_lut_GC();
+  //EPD_3IN52_refresh();
+  DEV_Delay_ms(500);
+  digitalWrite(CS,HIGH);
+}
+
+void drawanswer(UBYTE * image, char * question, char* answer, int CS){
+  digitalWrite(CS, LOW);
+  Paint_SelectImage(image);
+  Paint_Clear(WHITE);
+  Paint_DrawString_EN(100-2*strlen(question), 100, question, &Font16, WHITE, BLACK);
+  Paint_DrawString_EN(100-2*strlen(answer), 150, answer, &Font16, WHITE, BLACK);
+  Paint_DrawString_EN(300,50,"Easy",&Font16,WHITE,BLACK);
+  Paint_DrawString_EN(300,125,"Good",&Font16,WHITE,BLACK);
+  Paint_DrawString_EN(300,200,"Hard",&Font16,WHITE,BLACK);
   EPD_3IN52_display(image);
   //EPD_3IN52_lut_GC();
   //EPD_3IN52_refresh();
@@ -304,12 +321,12 @@ void drawwraptext(UBYTE * image, int x, int y, char * message, int CS){
       Serial.print("\r\n");
       remain -= lastSpace - start;
       start = lastSpace + 1;     
-      Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+      Paint_DrawString_EN(5, row * 12, rowstr, &Font16, WHITE, BLACK);
       row++; 
   }
   //last line
   copySubstring(message, rowstr, start, start + remain);
-  Paint_DrawString_EN(5, row * 12, rowstr, &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(5, row * 12, rowstr, &Font16, WHITE, BLACK);
   EPD_3IN52_display(image);
   //EPD_3IN52_lut_GC();
   //EPD_3IN52_refresh();
@@ -381,7 +398,7 @@ SPIClass * hspi = NULL;
 
 void setup() {
   // put your setup code here, to run once:
-
+  int wifitimeout = 0;
 ////////////////start of SD CODE!!!!!!!!! this is known to be working!!!
   Serial.begin(115200);
   while(!Serial) { delay (10); }
@@ -462,18 +479,21 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);
       Serial.print(".");
+      wifitimeout+=1;
+      if(wifitimeout==10){
+        Serial.println("wifi time out");
+        break;
+      }
   }
-  Serial.println(" CONNECTED");
+  if(wifitimeout!=10){
+    Serial.println(" CONNECTED");
+  }
 
-
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  audio.setVolume(21); // default 0...21
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  //Serial.printf("TEST");
-  //delay(500);
-  //chip select high
-  //spiCommand(hspi, 0b01010101);   //some garbage command for testing, will be commented out or deleted
 
   int cardval = 0;             //indexes cards within activecards[], not indexes of cards in parsed text input
   char * s;                //character pointer used to convert strings stored in meteadata text files to and from integers
@@ -483,25 +503,30 @@ void loop() {
   String learnstring;      //pulls string from metedata file \learnstatus.txt which in order contains a score of 0-9 for the aptitude of a learner for a card. no separation between characters.
   String cardstring;       //holds raw data from flashcards.txt
   String datestring;
+  String healthstring;
 
   String question;
   String answer;
+  String audiopath;
 
   unsigned int cardidx =0 ;        //indexes cards from the output of the text parser
   unsigned int newcardcnt = 0;     //counts how many new cards have been added to activecards[]
   unsigned int totalcards = 1;    //contains the total cards in the set. will be set by the text parser.
   unsigned int activecardcnt = 0;  //counts how many cards have been added to activecards[]
 
-  unsigned int activecards[100];   //contains the indexes of all active cards
-  unsigned int finished[100] = {0};//contains info if a card has been finished for the day. 1 is finished, 0 is not finished
+  unsigned int activecards[500];   //contains the indexes of all active cards
+  unsigned int finished[500] = {0};//contains info if a card has been finished for the day. 1 is finished, 0 is not finished
   int revbuffer[2];
   int day;
-  int dayspast;
+  int dayspast=0;
   int pethealth = 0;
+  int looper = 0;
 
   int b1state = 0;
   int b2state = 0;
   int b3state = 0;
+
+  int stringlen;
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   struct tm timeinfo;
@@ -509,13 +534,15 @@ void loop() {
     Serial.println("Failed to obtain time");
     day = 0;
   }
+  else{
+      day=(timeinfo.tm_yday+365*timeinfo.tm_year);
+  }
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   
-  day=(timeinfo.tm_yday+365*timeinfo.tm_year);
-
   srand(day);
+  Serial.println(day);
 
-    //START OF WAVESHARE SETUP
+    // START OF WAVESHARE SETUP
 
 
 printf("EPD_3IN52_setup\r\n");
@@ -541,7 +568,7 @@ printf("EPD_3IN52_setup\r\n");
 
     //Create a new image cache
     UBYTE *Image;
-    /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
+    // you have to edit the startup_stm32fxxx.s file and set a big enough heap size
     UWORD Imagesize = ((EPD_3IN52_WIDTH % 8 == 0)? (EPD_3IN52_WIDTH / 8 ): (EPD_3IN52_WIDTH / 8 + 1)) * EPD_3IN52_HEIGHT;
     if((Image = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for black memory...\r\n");
@@ -558,94 +585,34 @@ printf("EPD_3IN52_setup\r\n");
     digitalWrite(hcs, HIGH);
     digitalWrite(hcs2, HIGH);
     
-/*
-#if 1   // GC waveform refresh 
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-//	  Paint_DrawBitMap(gImage_3in52);	
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_GC();
-    EPD_3IN52_refresh();
-    
-#endif
-*/
 
-/*
-#if 0  //DU waveform refresh
-    printf("Quick refresh is supported, but the refresh effect is not good, but it is not recommended\r\n");
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-    Paint_DrawBitMap(gImage_3in52);
-		
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_DU();
-    EPD_3IN52_refresh();
-    DEV_Delay_ms(2000);
-
-#endif
-*/
-
-/*
-#if 1 
-    printf("SelectImage:Image\r\n");
-    Paint_SelectImage(Image);
-    Paint_Clear(WHITE);
-
-    printf("Drawing:Image\r\n");
-    Paint_DrawPoint(10, 80, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 90, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-    Paint_DrawPoint(10, 100, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-    Paint_DrawLine(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-    Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawCircle(45, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawCircle(105, 95, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawString_EN(10, 0, "waveshare", &Font16, BLACK, WHITE);
-    Paint_DrawString_EN(10, 20, "hello world", &Font12, WHITE, BLACK);
-    Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
-    Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
-    printf("EPD_Display\r\n");
-    EPD_3IN52_display(Image);
-    EPD_3IN52_lut_GC();
-    EPD_3IN52_refresh();
-    DEV_Delay_ms(2000);
-#endif
-*/
-
-/*
-    printf("Clear...\r\n");
-    EPD_3IN52_Clear();
-    
-    // Sleep & close 5V
-    printf("Goto Sleep...\r\n");
-    EPD_3IN52_sleep();
-
-    free(Image);
-    Image = NULL;
-    DEV_Delay_ms(2000);//important, at least 2s
-    printf("close 5V, Module enters 0 power consumption ...\r\n");
-
-*/
+  if(SD.exists("/pethealth.txt")){
+    healthstring=readFile(SD,"/pethealth.txt");
+    s=&healthstring[0];
+    pethealth=(((int)*s) - 48);
+    Serial.println(pethealth);
+  }
+  else{
+    pethealth=5;
+  }
 
   if(SD.exists("/dateinfo.txt")){
     datestring=readFile(SD,"/dateinfo.txt");
     s=&datestring[0];
-    dayspast+=10000* *s;
+    dayspast+=10000* (((int) *s)-48);
     s+=1;
-    dayspast+=1000* *s;
+    dayspast+=1000* (((int) *s)-48);
     s+=1;
-    dayspast+=100* *s;
+    dayspast+=100* (((int) *s)-48);
     s+=1;
-    dayspast+=10* *s;
+    dayspast+=10* (((int) *s)-48);
     s+=1;
-    dayspast+=*s;
+    dayspast+=(((int) *s)-48);
   }
   else{
     dayspast=day-1;
   }
+  Serial.println(dayspast);
 
   dayspast=day-dayspast;
 
@@ -659,6 +626,23 @@ printf("EPD_3IN52_setup\r\n");
       delay(1000);
     }
   }
+  
+  if(day!=0){
+    pethealth+=2-dayspast;
+    Serial.println("here");
+    Serial.println(pethealth);
+  }
+  else{
+    pethealth+=1;
+  }
+
+  if(pethealth<0){
+    pethealth=0;
+  }
+  if(pethealth>9){
+    pethealth=9;
+  }
+  Serial.println(pethealth);
 
 
   if(SD.exists("/flashcards.txt")){
@@ -759,7 +743,7 @@ printf("EPD_3IN52_setup\r\n");
 
   cardidx=0;
 
-  while(newcardcnt<20 && cardidx<totalcards){    //while less than 20 new cards selected and still have cards to search
+  while(newcardcnt<5 && cardidx<totalcards){    //while less than 20 new cards selected and still have cards to search
     if (newstate[cardidx]==0){                    //if card is new
       activecards[activecardcnt]=cardidx;        //add to active cards
       //Serial.println(cardidx);
@@ -771,7 +755,7 @@ printf("EPD_3IN52_setup\r\n");
 
   cardidx=0;
 
-  while(activecardcnt<100 && cardidx<totalcards){     //while less than 100 total active cards and still have cards to search
+  while(activecardcnt<500 && cardidx<totalcards){     //while less than 100 total active cards and still have cards to search
     if(newstate[cardidx]==1 && revstate[cardidx]==0){ //if card not new and revstate says 0 days to review
       activecards[activecardcnt]=cardidx;             //add to active cards
       activecardcnt+=1;
@@ -779,6 +763,31 @@ printf("EPD_3IN52_setup\r\n");
     cardidx+=1;
   }
 
+  if(pethealth<3){
+    drawpet(Image,PET_HEALTH4,hcs2);
+    drawtext(Image, 50,100,"Keep up daily practice!",hcs);
+  }
+  else if (pethealth<4){
+    drawpet(Image,PET_HEALTH3,hcs2);
+    drawtext(Image,50,100,"Keep on practicing!",hcs);
+  }
+  else if (pethealth<8){
+    drawpet(Image,PET_HEALTH2,hcs2);
+    drawtext(Image,50,100,"Good work! Keep it up!",hcs);
+  }
+  else{
+    drawpet(Image,PET_HEALTH1,hcs2);
+    drawtext(Image,50,100,"Great Work! So Happy!",hcs);
+  }
+
+  digitalWrite(hcs,LOW);
+  digitalWrite(hcs2,LOW);
+  EPD_3IN52_lut_GC();
+  EPD_3IN52_refresh();
+  digitalWrite(hcs2,HIGH);
+  digitalWrite(hcs,HIGH);
+
+  delay(2000);
   //now, activecards[] should contain all the active cards, with activecardcnt telling how many spaces are fill out of the possible 100
 
   while(cardval!=-1){
@@ -793,7 +802,8 @@ printf("EPD_3IN52_setup\r\n");
       Serial.println(activecards[cardval]);
       Serial.println(cardval);
       question = getquestion(activecards[cardval],cardstring);
-      drawtext(Image, 100 ,100, &(question[0]), hcs);
+      stringlen=strlen(&(question[0]));
+      drawtext(Image, 100-stringlen*2 ,100, &(question[0]), hcs);
       digitalWrite(hcs,LOW);
       EPD_3IN52_lut_GC();
       EPD_3IN52_refresh();
@@ -803,63 +813,73 @@ printf("EPD_3IN52_setup\r\n");
       
 
       while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
-        delay(10);
+        delay(1);
         b1state = digitalRead(button1);
         b2state = digitalRead(button2);
         b3state = digitalRead(button3);
       }
 
       Serial.println("Flipped!");
+      
       answer=getanswer(activecards[cardval],cardstring);
-      drawtext(Image, 100 ,100,&(answer[0]), hcs);
+      drawanswer(Image,&(question[0]),&(answer[0]),hcs);
       digitalWrite(hcs,LOW);
       EPD_3IN52_lut_GC();
       EPD_3IN52_refresh();
       digitalWrite(hcs,HIGH);
 
-
-
-      
-
-      b1state = 0;         //set all button reads back to unpressed
-      b2state = 0;
-      b3state = 0;
+      audiopath=getaudio(activecards[cardval],cardstring);
+      audio.connecttoFS(SD, &(audiopath[0]));
+      while(looper<100000){
+        audio.loop();
+        looper+=1;
+      }
+      looper=0;
+      audio.setAudioPlayPosition(0);
 
       delay(1000);
-
-      while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
-        delay(10);
+      //make sure all buttons unpressed before moving on
+      while(b1state!=0 || b2state!=0 || b3state!=0){
+        delay(1);
         b1state = digitalRead(button1);
         b2state = digitalRead(button2);
         b3state = digitalRead(button3);
       }
 
-      if(b1state){
+      
+
+      while(b1state==0 && b2state==0 && b3state==0){       //while no buttons pressed
+        delay(1);
+        b1state = digitalRead(button1);
+        b2state = digitalRead(button2);
+        b3state = digitalRead(button3);
+      }
+
+      if(b3state){
         finished[cardval]=1;
-        Serial.println("Button1");
+        Serial.println("Button3");
         newstate[activecards[cardval]]=1;
         if(learnstate[activecards[cardval]]<9){
           learnstate[activecards[cardval]]+=1;
         }
         revstate[activecards[cardval]]+=learnstate[activecards[cardval]]*4-3;   //THE -3 IS FOR TESTING, KILL IT LATER
-        drawtext(Image, 10 ,20,"Button 1", hcs);
+        drawtext(Image, 100 ,100,"Great!", hcs);
         drawpet(Image, PET_WELLDONE, hcs2);
       }
 
-      else if(b3state){
+      else if(b1state){
         //update pet sad
         if(learnstate[activecards[cardval]]>0){
           learnstate[activecards[cardval]]-=1;
         }
-        Serial.println("Button3");
-        drawtext(Image, 10 ,20,"Button 3", hcs);
+        Serial.println("Button1");
+        drawtext(Image, 100 ,100,"You'll get it next time!", hcs);
         drawpet(Image, PET_BAD, hcs2);
-
       }
 
       else if(b2state){
         Serial.println("Button2");
-        drawtext(Image, 10 ,20,"Button 2", hcs);
+        drawtext(Image, 100 ,100,"Okay!", hcs);
         drawpet(Image, PET_NORMAL, hcs2);
       }
 
@@ -870,11 +890,16 @@ printf("EPD_3IN52_setup\r\n");
       digitalWrite(hcs2,HIGH);
       digitalWrite(hcs,HIGH);
 
-      b1state = 0;         //set all button reads back to unpressed
-      b2state = 0;
-      b3state = 0;
-
       delay(1000);
+
+      //make sure all buttons unpressed before moving on
+      while(b1state!=0 || b2state!=0 || b3state!=0){
+        delay(1);
+        b1state = digitalRead(button1);
+        b2state = digitalRead(button2);
+        b3state = digitalRead(button3);
+      }
+
 
 
   }
@@ -895,6 +920,7 @@ printf("EPD_3IN52_setup\r\n");
   deleteFile(SD, "/revstatus.txt");
   deleteFile(SD, "/learnstatus.txt");
   deleteFile(SD, "/dateinfo.txt");
+  deleteFile(SD, "/pethealth.txt");
 
   cardidx=0;
 
@@ -907,14 +933,33 @@ printf("EPD_3IN52_setup\r\n");
     appendFile(SD,"/learnstatus.txt",itoa(learnstate[cardidx],s,10));
     cardidx+=1;                                 
   }
-
-  appendFile(SD,"/dateinfo.txt", itoa(day,s,10));
+  if(day!=0)
+  {
+    appendFile(SD,"/dateinfo.txt", itoa(day,s,10));
+  }
+  appendFile(SD,"/pethealth.txt",itoa(pethealth,s,10));
 
   Serial.println("Finished");
-  drawtext(Image, 10 ,20,"Finished", hcs);
+  if(pethealth<3){
+    drawpet(Image,PET_HEALTH4,hcs2);
+  }
+  else if (pethealth<4){
+    drawpet(Image,PET_HEALTH3,hcs2);
+  }
+  else if (pethealth<8){
+    drawpet(Image,PET_HEALTH2,hcs2);
+  }
+  else{
+    drawpet(Image,PET_HEALTH1,hcs2);
+  }
+
+  drawtext(Image,30,100,"Set finished for the day!",hcs);
+
   digitalWrite(hcs,LOW);
+  digitalWrite(hcs2,LOW);
   EPD_3IN52_lut_GC();
   EPD_3IN52_refresh();
+  digitalWrite(hcs2,HIGH);
   digitalWrite(hcs,HIGH);
 
   // Sleep & close 5V
@@ -935,7 +980,6 @@ printf("EPD_3IN52_setup\r\n");
   while(1){
     delay(1000);
   }
-
 
 }
 
@@ -1017,5 +1061,43 @@ String getanswer(unsigned int cardidx, String cards){
 
   return answer;
 
+}
+
+String getaudio(unsigned int cardidx, String cards){
+  char * c;
+  c = &cards[0];
+  String pathname;
+
+  for(int cardnum = 0; cardnum<cardidx; cardnum++){
+    while(*c != '\n'){
+      c+=1;               //step to end of the line
+    }
+    c+=1;
+  }
+
+  //c points to relevant question
+
+  while(*c != 9){
+    c+=1;
+  }
+
+  c+=1;
+
+  //c point to relevant answer
+
+  while(*c != 9){
+    c+=1;
+  }
+
+  c+=1;
+
+  //c points to mp3 path
+
+  while(*c != 9 && *c != '\n' && *c != 13 && *c != 10){
+    pathname+=*c;
+    c+=1;
+  }
+
+  return pathname;
 }
 
