@@ -1,2 +1,0 @@
-The design review went okay. I think we will go with an SD card for memory stuff. PCB is getting finished up, should
-be able to work on it after spring break

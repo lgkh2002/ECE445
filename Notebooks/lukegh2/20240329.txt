@@ -1,6 +1,0 @@
-Tested 3.3v power rail regulated down from 5v through barrel jack port.
-
-result: 3.295v measured at output terminal of linear regulator
-passed, within spec of 0.1 volts of 3.3v target.
-
-Also finished soldering board. Should be ready for ESP32 programming test next week.
