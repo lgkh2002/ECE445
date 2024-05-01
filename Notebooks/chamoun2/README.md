@@ -22,6 +22,9 @@ First TA meeting
 Started Arduino IDE project
 - Researched ESP32S3 Internet module
 - Continued work on the KiCad schematic, most notably the pinout for the ESP32S3WROOM
+  
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/1.png)
+
 
 ### 2/16/2024
 - Researched how SPI conections work with the ESP32 using Arduino IDE (All SPI pins are reassignable in Arudino IDE, so no need to worry about using specific ESP32 pins)
@@ -32,11 +35,17 @@ Finished up high level requirements and subsystem goals
 ### 2/22/2024
 - Switched buttons to be used with a Schmidtt trigger to prevent doubling user inputs
 - Ordered parts
+  
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/2.webp)
+
+  
 ### 2/29/2024
 -   Finished Memory Subsystem of PCB in KiCad
 -   Ordered MicroSD Card Reader
 -   Researched E-Paper Driver HAT by Waveshare
 -   Ordered more parts
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/3.png)
 
 
 ### 3/1/2024
@@ -60,9 +69,28 @@ Ordered more parts from the e-shop
 ### 3/23/2024
 Fixed polarity of barrel jack connector pins (before we had to swap these manually which caused a lot of additional wires)
 
+Old:
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/4.webp)
+
+New: 
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/5.PNG)
+
+
 ### 3/25/2024
 - Added test LED's to new PCB design for assisting when debugging
+  
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/6.png)
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/7.webp)
+
+
 - Added stencil request
+  
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/8.webp)
+
+  
 
 ### 3/26/2024
 - Passed second order of PCBWay Gerber Audit
@@ -75,10 +103,17 @@ Implementing GPIO pins, initial ESP32 programming tests, initial debugging with 
 First successful program flased to the ESP32
 - used serial monitor to confirm this
 - Here you can see the orange and green wires which temporarily fixed the barrel jack connector before our second order arrived
+  
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/9.webp)
+
+
 
 ### 4/4/2024
 Started work on the SD Card module
 - Attempted to use a 64GB SD card which would always provide us with error message "Card mount failed"
+ 
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/10.png)
+
 - Used a default ESP32S3 example within Arduino
 
 
@@ -99,8 +134,11 @@ Next day of SD Card tests began
 - Picked up second PCB order, more experienced teammate taught me how to populate a board using a reflow oven and stencil for smaller solder joints
 
 ### 4/12/2024
-- Had to directly solder a wire to the ESP32 in order to add DATA/COMMAND pins needed for the Waveshare library as I did not include the data and command pins when planning out the PCB
+- Had to directly solder a wire to the ESP32 in order to add DATA/COMMAND pins needed for the Waveshare library as I did not include the data and command pins when planning out the PCB. We used the middle of these X X X pins to ensure there were no issues with any solder bridges/shorts between the other pins
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/13.webp)
+
 -  Waveshare code finally working with default settings, next step is to parse data from a flashcard text file
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/11.PNG)
 
 ### 4/16/2024
 - Confirmed that audio could work with our SD card using the ESP32-audioI2s module, however does not work when implemented with our code
