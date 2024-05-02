@@ -21,6 +21,7 @@ Our solution is the JargonJolt, a digital pet and portable flashcard device that
 
 ### 2/09/2024
 Goal: Create Team Contract with team which includes a schedule for dates everyone is available to meet in person and online
+
 Completed: Team Contract submitted 
 
 ### 2/13/2024
@@ -33,6 +34,7 @@ First TA meeting
 
 ### 2/16/2024
 Goal: Get started on our Internet submodule
+
 Completed:
 Started Arduino IDE project
 - Researched ESP32S3 Internet module
@@ -117,6 +119,7 @@ Current pin setup where the number is the corresponding GPIO number:
 
 ### 3/4/2024
 Goal: Get audit approval from PCBWay in order to submit our first PCB order
+
 Completed:
 - Sent Gerbers to PCBWay for approval to TA (approved)
 - Sent second order of parts to TA
@@ -161,6 +164,7 @@ Completed:
 
 ### 3/26/2024
 Goal: Submit second PCB order to TA after approving the audit with PCBWay
+
 Completed:
 - Passed second order of PCBWay Gerber Audit
 - Waiting on team to get back to me on the updated schematics and if they approve of it as well, I will submit the already approved gerbers to our TA.
