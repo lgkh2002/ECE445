@@ -8,7 +8,10 @@ Name of Project has been decided: JargonJolt!
 Started RFA document 
 
 ### 01/30/2024
-Project Proposal approved
+Project Proposal approved:
+
+Our solution is the JargonJolt, a digital pet and portable flashcard device that makes consistently practicing your language skills convenient and fun! The JargonJolt will take advantage of the “tamagotchi effect”. Named after the popular toy by Bandai, the tamagotchi effect is the phenomenon of humans becoming emotionally attached to machines, robots, or otherwise inanimate entities. We plan to harness this aspect of human psychology to encourage people to keep up with their daily language review and practice. Nurturing/playing with a digital pet who gets happier as you do better in your flashcard reviews will keep flashcard users more engaged during their reviews as well as more consistent. 
+
 
 ### 2/09/2024
 Team Contract submitted 
@@ -27,13 +30,20 @@ Started Arduino IDE project
 
 
 ### 2/16/2024
-- Researched how SPI conections work with the ESP32 using Arduino IDE (All SPI pins are reassignable in Arudino IDE, so no need to worry about using specific ESP32 pins)
-- Found and imported footprint for ESP32 in KICad
+- Researched how SPI connections work with the ESP32 using Arduino IDE (All SPI pins are reassignable in Arudino IDE, so no need to worry about using specific ESP32 pins)
+- Found and imported footprint for ESP32 in KICad, making it accessible to everyone else in the git repo as it is a relatively specific version of the ESP32
+  
 ### 2/21/2024
 Finished up high level requirements and subsystem goals
 
+High Level Requirements:
+- The device enables users to view flashcards, see answers, select their results, and monitor the status of a digital pet. Flipping and switching between flashcards must be completed within 1 second, and the digital pet should respond to any state changes within 1 second.
+- The device must have the capacity to store and recall ‘question and answer’ data for up to 500 flashcards, in addition to retaining user interaction history with the flashcard set. Furthermore, it should be capable of downloading flashcard sets from the internet in under 5 minutes.
+- The device should be portable, with dimensions not exceeding 160mm x 120mm, and designed for long-term use. It must feature a rechargeable battery with a lifespan of at least 2 hours on a single charge.
+
+
 ### 2/22/2024
-- Switched buttons to be used with a Schmidtt trigger to prevent doubling user inputs
+- Switched buttons to be used with a Schmidtt trigger to prevent doubling user inputs as opposed to just a simple capacitor
 - Ordered parts
   
 ![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/2.webp)
