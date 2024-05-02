@@ -261,3 +261,9 @@ Completed:
 
 ### 4/23/2024
 Demo Day :)
+
+
+### References
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/references.PNG)
+
