@@ -1,54 +1,67 @@
-2/20/2024
+### Nan Kang Lab Notebook
+
+## 2/20/2024
 - Research how to use AutoCAD
 - Create a rough 3D outshell in AutoCAD
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/02202024_autocad.png)
 
-3/2/2024
+## 3/2/2024
 - Research 3.52inch_e-Paper SPI communication and code to print image on the screen
 - Research image format conversion for screen
 
-3/3/2024
+## 3/3/2024
 - Research SD Card SPI
 - Add SD Card test code 
 
-3/24/2024
+## 3/24/2024
 - Realize AutoCAD is not easy to use, then start working on enclosure 3D modeling in Fusion
 - Get familiar with Fusion and make a basic case shape according to major parts' sizes
 
-3/25/2024
+## 3/25/2024
 - Add some screw holes to the model to hold the enclosure part together
 
-3/26/2024
+## 3/26/2024
 - Measure screen layout and add screen holders to the model
 
-3/29/2024
+## 3/29/2024
 - Reasearch on screw size and drillling
 - Resize the upper screen position due to overlapping
 - Add button holes, speaker hole, pcb holder
 - Finalize some details and ready for 3D print
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/03292024_enclosure.png)
 
-4/2/2024
+## 4/2/2024
 - Be able to print text and image on the screen
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04022024_screen_img.png)
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04022024_screen_text.png)
 
-4/3/2024
+## 4/3/2024
 - Measure parts dimension and adjust the inner height and holder position of the enclosure
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04032024_adjust_height.png)
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04032024_adjusted_enclosure.png)
 
-4/6/2024
+## 4/6/2024
 - Submitted the enclosure 3D model printing request
 - Complete screen word wrap function by an arduino
 
-4/8/2024
+## 4/8/2024
 - Tried to modify the arduino screen code on our PCB but failed, then switch to esp32 code
 
-4/9/2024
+## 4/9/2024
 - Ressigned the pin in the esp32, still doesn't work
 
-4/13/2024
+## 4/13/2024
 - Modify the esp32 screen code, now it is working with a word wrap
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04132024_smart_word_wrap.jpg)
 
-4/17/2024
+## 4/17/2024
 - Deal with pet image, screen can display differet pet emotion images
+![video](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04172024_pet_emo.mov)
 
-4/22/2024
+## 4/22/2024
 - Polish the printed enclosure and make sure every parts fit in the enclosure
+![image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04222024_before_polished.jpg)
 - Assemble everything inside the enclosure
+![image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04222024_assemble.jpg)
+![image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04222024_assemble2.jpg)
 - Add more pet images for two types of status
