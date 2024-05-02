@@ -1,7 +1,7 @@
 ## Daniel Chamoun Worklog
 
 
-### 01/24/2024 10:16 PM
+### 01/24/2024
 Goals: Finalize final project idea and come up with a name
 
 Completed: Name of Project has been decided: JargonJolt!
