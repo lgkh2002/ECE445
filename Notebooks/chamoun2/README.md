@@ -3,14 +3,17 @@
 
 ### 01/24/2024 10:16 PM
 Goals: Finalize final project idea and come up with a name
+
 Completed: Name of Project has been decided: JargonJolt!
 
 ### 01/29/2024
 Goals: Complete RFA document
+
 Completed: Started RFA document 
 
 ### 01/30/2024
 Goals: Double check on the ECE445 board that our project is approved 
+
 Completed: Project Proposal approved
 
 Our solution is the JargonJolt, a digital pet and portable flashcard device that makes consistently practicing your language skills convenient and fun! The JargonJolt will take advantage of the “tamagotchi effect”. Named after the popular toy by Bandai, the tamagotchi effect is the phenomenon of humans becoming emotionally attached to machines, robots, or otherwise inanimate entities. We plan to harness this aspect of human psychology to encourage people to keep up with their daily language review and practice. Nurturing/playing with a digital pet who gets happier as you do better in your flashcard reviews will keep flashcard users more engaged during their reviews as well as more consistent. 
@@ -22,6 +25,7 @@ Completed: Team Contract submitted
 
 ### 2/13/2024
 Goal: Clarify difficulties I think that we will experience. Regarding memory spaces, I believe there to be some necessity to using an SD card if we plan to store a large number of audio files
+
 Completed: 
 First TA meeting
 - We talked about storage concerns when using SDRAM
@@ -41,12 +45,14 @@ Verifying that we can program to the ESP32 is the most important, so we looked a
 
 ### 2/16/2024
 Goal: Finish the control subsystem in KiCad, Setup SPI in KiCad
+
 Completed:
 - Researched how SPI connections work with the ESP32 using Arduino IDE (All SPI pins are reassignable in Arudino IDE, so no need to worry about using specific ESP32 pins)
 - Found and imported footprint for ESP32 in KICad, making it accessible to everyone else in the git repo as it is a relatively specific version of the ESP32
   
 ### 2/21/2024
 Goal: Finish up high level requirements and subsystem goals
+
 Completed:
 High Level Requirements:
 - The device enables users to view flashcards, see answers, select their results, and monitor the status of a digital pet. Flipping and switching between flashcards must be completed within 1 second, and the digital pet should respond to any state changes within 1 second.
@@ -58,6 +64,7 @@ Subsystem Goals:
 
 ### 2/22/2024
 Goal: Update buttons from simple capacitor debounced buttons to Schmidtt trigger debouncing
+
 Completed:
 - Switched buttons to be used with a Schmidtt trigger to prevent doubling user inputs as opposed to just a simple capacitor
 - Ordered parts
@@ -67,6 +74,7 @@ Completed:
   
 ### 2/29/2024
 Goal: Finish Memory Subsystem in the KiCad schematic, research more on the memory subsystem / microSD card module
+
 Completed:
 -   Finished Memory Subsystem in both the schematic and the PCB within KiCad
 -   Ordered MicroSD Card Reader
@@ -86,6 +94,7 @@ Completed:
 
 ### 3/2/2024
 Goal: Assigned/Define GPIO pins within Arduino IDE to correspond to the ESP32 pins
+
 Completed:
 - Researched how GPIO pins are defined
 - GPIO pins are completely defineable for the ESP32S3 within Arduino IDE
@@ -115,10 +124,12 @@ Completed:
 
 ### 3/21/2024
 Goal: Ensure that we have all of the parts we need to begin populating our first PCB design
+
 Completed: Ordered more parts from the e-shop to obtain a couple of parts that we forgot to order
 
 ### 3/23/2024
 Goal: Work on a second PCB design in time for the next PCB order
+
 Completed: 
 Fixed polarity of barrel jack connector pins (before we had to swap these manually which caused a lot of additional wires)
 
@@ -133,6 +144,7 @@ New:
 
 ### 3/25/2024
 Goal: Continue working on new PCB design with more debug/testing features
+
 Completed:
 - Added test LED's to new PCB design for assisting when debugging
   
@@ -155,11 +167,13 @@ Completed:
 
 ### 3/31/2024
 Goal: Get a program flashed onto the ESP32
+
 Completed:
 Implementing GPIO pins, initial ESP32 programming tests, initial debugging with first order PCB, still have yet to directly program the ESP32 as we need a USB/UART bridge programmer
 
 ### 4/2/2024
 Goal: Program to ESP32
+
 Completed:
 First successful program flased to the ESP32
 - used serial monitor to confirm this
@@ -172,6 +186,7 @@ First successful program flased to the ESP32
 
 ### 4/4/2024
 Goal: Flash program that sends data from the SD card reader to the ESP32 and back, day 1
+
 Completed:
 Started work on the SD Card module
 - Attempted to use a 64GB SD card which would always provide us with error message "Card mount failed"
@@ -183,10 +198,12 @@ Started work on the SD Card module
 
 ### 4/5/2024
 Goal: Flash program that sends data from the SD card reader to the ESP32 and back, day 2
+
 Completed: Continuing debugging SD Card issues
 
 ### 4/6/2024
 Goal: Flash program that sends data from the SD card reader to the ESP32 and back, day 3
+
 Completed:
 Next day of SD Card tests began
 - Read some threads online regarding faulty SD cards not being configured with the ESP32 library, so we bought a new SD card from a store
@@ -196,16 +213,19 @@ Next day of SD Card tests began
 
 ### 4/8/2024
 Goal: Get Waveshare library working on our PCB
+
 Completed:
 - Started configuring Waveshare library via their example code
 
 ### 4/10/2024
 Goal: Populate second PCB design with Luke
+
 Completed:
 - Picked up second PCB order, more experienced teammate taught me how to populate a board using a reflow oven and stencil for smaller solder joints
 
 ### 4/12/2024
 Goal: Figure out why waveshare library was not working with our PCB
+
 Completed:
 - Had to directly solder a wire to the ESP32 in order to add DATA/COMMAND pins needed for the Waveshare library as I did not include the data and command pins when planning out the PCB. We used the middle of these X X X pins to ensure there were no issues with any solder bridges/shorts between the other pins
 ![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/chamoun2/images/13.webp)
@@ -223,11 +243,13 @@ Completed:
 
 ### 4/17/2024-4/21/2024
 Goal: Need audio to work with our PCB design and program/pin definitions, days 1-4
+
 Completed:
 Continue implementation of audio files, reading multiple threads online regarding why audioI2S files would are not playing. Still having issues
 
 ### 4/22/2024
 Goal: Need audio to work with our PCB design and program/pin definitions, day 5
+
 Completed:
 - Added buttons to connectors so we can begin finishing touches.
 - Finally fixed audio. Error was only reading one sample of the bitstream. The example code worked because the loop function itself was placed inside of a loop which automatically incremented the counter to the next sample. Putting the .loop into a loop in our code fixed this issue and now reads the entire bitstream.
