@@ -32,16 +32,21 @@ Create an outline of the enclosure based on the screen dimension.
 
 Completed:
 - Realize AutoCAD is not easy to use, then start working on enclosure 3D modeling in Fusion.
-- Watched tutorial video and get familiar with Fusion 
-- Measure the display region dimension of the screens and make a basic case shape according to major parts' sizes
+- Watched tutorial video and get familiar with Fusion.
+- Measure the display region dimension of the screens and make a basic case shape according to major parts' sizes.
 
 ## 3/25/2024
 Goal:
 Add some screw holes to the model to hold the enclosure part together.
 
 Completed:
-- I excluded a face at the connection of the enclosure bottom case to prevent sliding when closing the enclosure and added a offset on it to make sure it has extra space to close the enclosure
+- I excluded a face at the connection of the enclosure bottom case to prevent sliding when closing the enclosure and added a offset on it to make sure it has extra space to close the enclosure.
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/03252024_connection.png)
+
 - I excluded some screw holes inside the bottom part so screws will hide in the holes without hurting fingers while useing.
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/03252024_screw.png)
 
 ## 3/26/2024
 Goal:
@@ -50,6 +55,8 @@ Add screen holders on the enclosure.
 Completed:
 - I spent a lot of time on designing the way to hold the screen. Since these two screens are placed together very closely, it is impossible to use 4 holders on each one. And I also need to consider if these holders will prevert me to insert both screens into the slot.
 - Another thing to consider about is the back side of the screen. Since the screen has a thick port on the bottom side, to save more space for our PCB board, I decided to place one of them up-side-down.
+
+![Image](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/03262024_screen_holder.png)
 
 ## 3/29/2024
 Goal:
@@ -123,6 +130,7 @@ Be able to display pet image on the screen.
 
 Completed:
 - Transform the pet image to binary format and write the pet display function according to the status.
+
 ![video](https://github.com/lgkh2002/ECE445/blob/main/Notebooks/nankang2/04172024_pet_emo.mov)
 
 ## 4/22/2024
